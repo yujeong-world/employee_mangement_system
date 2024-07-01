@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.employee_system.mapper.EmployeeMapper">
+
+    <select id="selectEmployeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee
+    </select>
+
+    <!--직원 아이디 중복 조회 -->
+    <select id="idCheck" resultType="int">
+        select count(*)
+        from employee
+        where employ_id = #{id}
+    </select>
+
+    <!--직원 단건 조회-->
+    <select id="selectEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee where employ_id = #{id}
+    </select>
+
+    <!--직원 조회 pk-->
+    <select id="selectEmployeeById" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee where id = #{id}
+    </select>
+
+    <!--직원 등록-->
+    <insert id="insertEmployee" parameterType="com.example.employee_system.vo.EmployeeVo" >
+        insert into
+            employee (  EMPLOY_ID, EMPLOY_NAME, EMPLOY_RANK, PHONE, EMAIL, CREATE_AT)
+        values (#{employId}, #{employName}, #{employRank}, #{phone}, #{email}, now())
+        <selectKey keyProperty="id" resultType="long" order="AFTER" keyColumn="id">
+            select id from employee where EMPLOY_ID = #{employId}
+        </selectKey>
+       <!-- <selectKey keyColumn="id" keyProperty="" resultType="long">
+            select id from employee where EMPLOY_ID = #{employId}
+        </selectKey>-->
+    </insert>
+
+    <!--직원 수정-->
+    <update id="modifyEmployee" parameterType="com.example.employee_system.vo.EmployeeVo">
+        update employee
+        set EMPLOY_ID= #{employId}, EMPLOY_NAME = #{employName}, EMPLOY_RANK=#{employRank}, PHONE = #{phone}, EMAIL =#{email}, MODIFY_AT = now()
+        where id = #{id}
+    </update>
+
+    <!--직원 삭제-->
+    <delete id="deleteEmployee" parameterType="int">
+        delete
+        from employee
+        where EMPLOY_ID=#{employId}
+    </delete>
+
+    <!--총 개시물 개수 반환-->
+    <select id="totalCount" resultType="int">
+        select count(*) from employee
+    </select>
+
+    <select id="findEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee limit #{limit} offset #{offset}
+    </select>
+
+    <!--검색 기능-->
+    <sql id="searchConditions">
+        <where>
+            <if test="category == 'name'">
+                AND employ_name LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="category == 'id'">
+                AND employ_id LIKE CAST(#{keyword} AS INTEGER)
+            </if>
+            <if test="category == 'rank'">
+                AND employ_rank LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="category == 'phone'">
+                AND phone LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="category == 'email'">
+                AND email LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 직원 검색 결과 조회 -->
+    <select id="searchEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee
+        <include refid="searchConditions"/>
+        limit #{pageSize} offset #{pageIndex}
+    </select>
+
+    <!-- 검색된 직원 수 조회 -->
+    <select id="searchEmployeeCount" resultType="int">
+        select count(*) from employee
+        <include refid="searchConditions"/>
+    </select>
+
+
+
+</mapper>

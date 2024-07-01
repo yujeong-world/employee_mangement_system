@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.employee_system.mapper.FileMapper">
+
+    <!--직원 등록-->
+    <insert id="saveFile" parameterType="com.example.employee_system.vo.FileVo">
+        insert into
+            file (  EMPLOY_ID, ORIGINAL_NAME, SAVE_NAME, CREATE_AT)
+        values (#{employId}, #{originalName}, #{saveName}, now())
+    </insert>
+
+
+    <!--파일 조회-->
+    <select id="selectFileById" resultType="com.example.employee_system.bean.dto.FileDto">
+        select * from file where EMPLOY_ID = #{employId}
+    </select>
+
+    <!--파일 수정-->
+    <update id="updateFile">
+        update file
+        set ORIGINAL_NAME =  #{originalName},
+            SAVE_NAME = #{saveName},
+            CREATE_AT = now()
+        where EMPLOY_ID = #{employId}
+    </update>
+</mapper>
