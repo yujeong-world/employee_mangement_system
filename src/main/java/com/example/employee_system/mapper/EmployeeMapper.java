@@ -12,7 +12,7 @@ public interface EmployeeMapper {
     List<EmployeeDto> selectEmployeeList();
 
     //직원 등록
-    void insertEmployee(EmployeeVo employee);
+    void  insertEmployee(EmployeeVo employee);
 
     //직원 아이디 중복 조회
     int idCheck(int id);

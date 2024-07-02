@@ -3,6 +3,7 @@ package com.example.employee_system.controller;
 import com.example.employee_system.bean.dto.FileDto;
 import com.example.employee_system.service.FileService;
 import com.example.employee_system.vo.FileVo;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -13,15 +14,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.imageio.IIOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 
 @Controller
 public class FileController {
@@ -35,111 +41,57 @@ public class FileController {
 
     //파일 저장하기
     @PostMapping("/saveFile")
-    public ModelAndView saveFile(@RequestBody FileVo fileVo) {
+    public ModelAndView saveFile(@RequestBody FileVo fileVo) throws IOException {
         ModelAndView modelAndView = new ModelAndView();
 
-        fileService.fileSave(fileVo);
-        //
-        // fileService.
+        byte[] fileBytes = Base64.getDecoder().decode(fileVo.getFileData());
+        fileService.fileSave(fileVo, fileBytes);
+
         return new ModelAndView("redirect:/");
     }
 
     // 파일 삭제하기
-    @PostMapping("/fileDelete")
-    public ModelAndView fileDelete(@RequestBody FileDto fileDto) {
+    @PostMapping("/fileDelete/{id}")
+    public ModelAndView fileDelete(@PathVariable String id) {
+        //형 변환
+        long fileId = Long.parseLong(id);
+
         ModelAndView modelAndView = new ModelAndView();
-
-        //fileService.deleteFile(int id);
-
+        fileService.deleteFile(fileId);
         return new ModelAndView("redirect:/");
     }
 
-    //파일 저장하기
-    @GetMapping("/download/{fileId}")
-    public ModelAndView download(@PathVariable("fileId") Long fileId) {
-        //파일의 정보를 가지고 온다.
-        FileDto fileDto = fileService.getFileById(fileId);
-
-        ModelAndView mav = new ModelAndView();
-
-
-        return mav;
-    }
-
-//    @GetMapping("/download/{filename:.+}")
-//    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-//
-//    }
-
-
     private final Path fileStorageLocation = Paths.get("C:/dev/").toAbsolutePath().normalize();
 
-   /* @GetMapping("/download/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-        try {
-            Path filePath = fileStorageLocation.resolve(filename).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
+   private final String FILE_DIRECTORY = "C:/dev/";
 
-            if (resource.exists()) {
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }*/
+   //파일 다운로드
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") String fileId) throws IOException {
 
-   /* @GetMapping("/download/{fileName:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String fileName) {
-        try {
-            // 파일명 URL 디코딩
-            String decodedFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
-            Path filePath = fileStorageLocation.resolve(decodedFileName).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
+        long id = Long.parseLong(fileId);
 
-            if (resource.exists() && resource.isReadable()) {
-                String contentType = Files.probeContentType(filePath);
-                if (contentType == null) {
-                    contentType = "application/octet-stream";
-                }
+        //경로 확인하기
+        FileDto fileDto = fileService.getFileById(id);
+        String path = fileDto.getSavePath();
+        String fileName = fileDto.getOriginalName();
 
-                return ResponseEntity.ok()
-                        .contentType(org.springframework.http.MediaType.parseMediaType(contentType))
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            } else {
-                throw new RuntimeException("파일을 찾을 수 없거나 읽을 수 없습니다: " + decodedFileName);
-            }
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException("파일 경로가 잘못되었습니다: " + fileName, ex);
-        } catch (Exception ex) {
-            throw new RuntimeException("파일을 다운로드하는 동안 오류가 발생했습니다: " + fileName, ex);
-        }
-    }*/
-
-    private final String FILE_DIRECTORY = "C:\\dev";
-
-    @GetMapping("/files/download/{fileName}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileName") String fileName) throws IOException {
-        File file = new File(FILE_DIRECTORY + fileName);
+        File file = new File(path + "/"+fileName);
         if (!file.exists()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName);
+        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName);
+
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(file.length())
                 .body(resource);
     }
-
-
 
 
 }

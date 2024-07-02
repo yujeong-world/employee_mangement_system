@@ -27,11 +27,8 @@ public class EmployeeService {
     //직원 등록
     @Transactional
     public void addEmployee(EmployeeVo employee){
-        //return employeeMapper.insertEmployee(employee);
         // 직원 정보 삽입
         employeeMapper.insertEmployee(employee);
-        //employee.getEmployId();
-        // 삽입 후 employeeVo 객체에 자동 생성된 ID가 설정됩니다.
 
     }
 

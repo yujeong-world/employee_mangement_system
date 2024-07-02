@@ -16,5 +16,6 @@ public class FileDto {
     private int employId;
     private String originalName;
     private String saveName;
+    private String savePath;
     private LocalDateTime createAt;
 }

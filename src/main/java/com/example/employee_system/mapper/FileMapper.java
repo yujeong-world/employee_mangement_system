@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface FileMapper {
     // 파일 정보 조회
-    FileDto selectFileByEmployId(int id);
+    FileDto selectFileByEmployId(Long id);
 
     //pk를 가지고 파일 정보 조회
     FileDto selectFileById(Long id);
@@ -16,10 +16,12 @@ public interface FileMapper {
     void saveFile(FileVo fileVo);
 
     //파일 삭제
-    void deleteFileById(int id);
-
+    void deleteFileById(Long id);
 
     //파일 수정
     void updateFile(FileVo fileVo);
+
+    //파일 경로 수정하기
+    void updateFilePath(long id, String filePath);
 }
 

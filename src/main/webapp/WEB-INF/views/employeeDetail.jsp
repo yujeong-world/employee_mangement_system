@@ -15,47 +15,50 @@
 
 
     <script>
-
-        function saveFile(){
-            debugger
-            //let employId = employId;
-            let originalName= $("#original_name").val();
-            console.log(originalName+"파일명 테스트")
-            debugger
-            let saveName= $("#save_name").val();
-
-            //이름 입력 안했을 경우
-
-            //파일 입력 안했을 경우
-
-            let data = {
-                "employId": employId,
-                "originalName": originalName,
-                "saveName" : saveName
-            }
-
-            console.log(typeof originalName);
-            debugger
+        // originalName 변수에서 경로를 제거하고 파일 이름만 추출하는 함수
+        function getFileName(originalName) {
+            // 파일 경로를 분리하여 배열로 만든 후, 마지막 요소를 반환하여 파일 이름만 추출
+            return originalName.split('\\').pop().split('/').pop();
+        }
 
 
-            console.log(data + "데이터 로그")
-            debugger
+        function saveFile() {
+            let originalName = $("#original_name").val();
+            originalName = getFileName(originalName);
 
-            $.ajax({
-                anyne:true,
-                type:'POST',
-                data:JSON.stringify(data),
-                url: "${contextPath}/saveFile",
-                dataType : "text",
-                contentType : 'application/json; charset=utf-8',
-            }).done(function(){
-                console.log("성공");
-                debugger
-                window.location.href = "${contextPath}/employeeDetail/"+employId;
-            }).fail(function(error){
-                alert("실패하였습니다.")
-                alert(JSON.stringify(error));
-            })
+            let employId = $("#employId").text();
+
+            let fileInput = $("#original_name")[0];
+            let file = fileInput.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let arrayBuffer = e.target.result;
+                let bytes = new Uint8Array(arrayBuffer);
+                let binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+                let encodedFile = btoa(binaryString); // base64 인코딩
+
+                let data = JSON.stringify({
+                    employId: employId,
+                    originalName: originalName,
+                    fileData: encodedFile
+                });
+
+                $.ajax({
+                    type: 'POST',
+                    url: "${contextPath}/saveFile",
+                    data: data,
+                    contentType: 'application/json',
+                    success: function() {
+                        console.log("성공");
+                        window.location.href = "${contextPath}/employeeDetail/" + employId;
+                    },
+                    error: function(error) {
+                        alert("실패하였습니다.");
+                        alert(JSON.stringify(error));
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
         }
     </script>
 </head>
@@ -87,20 +90,20 @@
         <h3>저장된 파일</h3>
         <div>
             <p>파일 이름 : <span>${file.saveName}</span></p>
+            <p>파일 아이디 : <span>${file.id}</span></p>
             <p>파일 원본이름 : <span>${file.originalName}</span></p>
             <p>파일 등록일 : <span>${file.createAt}</span></p>
         </div>
         <!-- Display File Information -->
         <c:if test="${file != null}">
-            <p>File Name: ${file.originalName}</p>
-           <%-- <a href="${pageContext.request.contextPath}/download/${file.saveName}">Download File</a>--%>
-            <%--<a href="${pageContext.request.contextPath}/files/download/${fn:escapeXml(fileName)}">Download File</a>--%>
-            <a href="${pageContext.request.contextPath}/files/download/${fn:escapeXml(fileName)}">Download File</a>
+            <a href="${pageContext.request.contextPath}/download/${file.id}">${file.saveName}</a>
         </c:if>
+
+        <button id="delete_file">파일 삭제</button>
     </div>
 
     <%--파일 업로드 영역--%>
-    <div>
+    <%--<div>
         <p>직원 파일 업로드</p>
         <form>
             <label>파일 이름 : </label>
@@ -111,7 +114,7 @@
 
             <button type="submit" onclick="saveFile()">파일 저장하기 버튼</button>
         </form>
-    </div>
+    </div>--%>
 
 
 

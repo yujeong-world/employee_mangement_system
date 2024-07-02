@@ -5,14 +5,14 @@
     <!--직원 등록-->
     <insert id="saveFile" parameterType="com.example.employee_system.vo.FileVo">
         insert into
-            file (  EMPLOY_ID, ORIGINAL_NAME, SAVE_NAME, CREATE_AT)
-        values (#{employId}, #{originalName}, #{saveName}, now())
+            file (  EMPLOY_ID, ORIGINAL_NAME, SAVE_NAME, SAVE_PATH, CREATE_AT)
+        values (#{employId}, #{originalName}, #{saveName}, #{savePath},now())
     </insert>
 
 
     <!--파일 조회-->
     <select id="selectFileByEmployId" resultType="com.example.employee_system.bean.dto.FileDto">
-        select * from file where EMPLOY_ID = #{employId}
+        select * from file where EMPLOY_ID = #{id}
     </select>
 
     <!--파일 조회(pk 정보를 가지고)-->
@@ -28,4 +28,17 @@
             CREATE_AT = now()
         where EMPLOY_ID = #{employId}
     </update>
+
+    <update id="updateFilePath">
+        UPDATE file
+        SET SAVE_PATH = #{filePath}
+        WHERE ID = #{id}
+    </update>
+
+    <!--파일 삭제-->
+    <delete id="deleteFileById" parameterType="long">
+        delete
+        from file
+        where id=#{id}
+    </delete>
 </mapper>
