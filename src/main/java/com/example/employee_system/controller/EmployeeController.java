@@ -8,8 +8,6 @@ import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.service.EmployeeService;
 //import jakarta.servlet.http.HttpServletRequest;
 import com.example.employee_system.service.FileService;
-import com.example.employee_system.vo.EmployeeVo;
-import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,7 +74,7 @@ public class EmployeeController {
         mav.setViewName("employeeDetail");
 
         // 직원 파일 조회
-        FileDto fileDto = fileService.getFileById(id);
+        FileDto fileDto = fileService.getFileByEmployId(id);
         mav.addObject("file", fileDto);
         EmployeeDto employee = employeeService.employee(id);
         mav.addObject("employee", employee);
@@ -133,13 +131,15 @@ public class EmployeeController {
     }
 
     //직원 수정
-    @PostMapping("/modifyEmploy/{id}")
+    @PostMapping("/modifyEmploy/{employId}")
     @ResponseBody
-    public String modifyEmployee(@PathVariable("id") int id, @RequestBody JoinRequestDto joinRequestDto) throws Exception {
+    public String modifyEmployee(@PathVariable("employId") int employId, @RequestBody JoinRequestDto joinRequestDto) throws Exception {
         //기본 정보 수정
         employeeService.modifyEmployee(joinRequestDto.getEmployeeVo());
 
         // 파일 수정
+        Long id = joinRequestDto.getEmployeeVo().getId();
+        joinRequestDto.getFileVo().setEmployId(id);
         fileService.fileModify(joinRequestDto.getFileVo());
 
         return "success";
@@ -162,7 +162,7 @@ public class EmployeeController {
         System.out.println("콘솔 테스트" + employee);
 
         // 수정할 직원 조회 - 파일 조회
-        FileDto fileDto = fileService.getFileById(id);
+        FileDto fileDto = fileService.getFileByEmployId(id);
 
         // JoinRequestDto 객체 생성
         RequestDto response = new RequestDto();

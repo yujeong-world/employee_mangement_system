@@ -7,19 +7,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class FileService {
     private final FileMapper fileMapper;
 
     // 직원 파일 조회
-    public FileDto getFileById(int id) {
-        return fileMapper.selectFileById(id);
+    public FileDto getFileByEmployId(int id) {
+        return fileMapper.selectFileByEmployId(id);
     }
 
+    //파일 정보 조회(pk를 가지고)
+    public FileDto getFileById(Long id){
+        return fileMapper.selectFileById(id);
+    }
 
     @Transactional
     public void fileSave(FileVo fileVo) {

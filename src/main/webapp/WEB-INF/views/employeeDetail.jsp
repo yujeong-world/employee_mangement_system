@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -89,6 +90,13 @@
             <p>파일 원본이름 : <span>${file.originalName}</span></p>
             <p>파일 등록일 : <span>${file.createAt}</span></p>
         </div>
+        <!-- Display File Information -->
+        <c:if test="${file != null}">
+            <p>File Name: ${file.originalName}</p>
+           <%-- <a href="${pageContext.request.contextPath}/download/${file.saveName}">Download File</a>--%>
+            <%--<a href="${pageContext.request.contextPath}/files/download/${fn:escapeXml(fileName)}">Download File</a>--%>
+            <a href="${pageContext.request.contextPath}/files/download/${fn:escapeXml(fileName)}">Download File</a>
+        </c:if>
     </div>
 
     <%--파일 업로드 영역--%>

@@ -3,7 +3,7 @@
 <mapper namespace="com.example.employee_system.mapper.EmployeeMapper">
 
     <select id="selectEmployeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee
+        select * from employee order by employ_id
     </select>
 
     <!--직원 아이디 중복 조회 -->
