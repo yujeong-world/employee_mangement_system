@@ -16,31 +16,13 @@
 
     <script type="text/javascript">
 
-        // 직원 상세 조회
-        function detail(id){
-            $.ajax({
-                anyne:true,
-                type:'GET',
-                url: "${contextPath}/employeeDetail/"+id,
-            }).done(function(){
-                console.log("성공");
-                window.location.href = "${contextPath}/employeeDetail/"+id;
-            }).fail(function(error){
-                console.log(id, "아이디")
-                alert("실패하였습니다.", id)
-                alert(JSON.stringify(error));
-            })
-
-        }
-
         //직원 번호 중복 체크
-        function idCheck(){
+        function idCheck(event){
             event.preventDefault(); // 폼의 기본 제출 이벤트 막기
             let employIdForm = $("#employId").val();
             if(employIdForm != employId){
 
             }
-
             $.ajax({
                 type: 'GET',
                 url: '${contextPath}/idCheck',
@@ -87,7 +69,7 @@
             return regName.test(phone);
         }
 
-        //직원 등록
+
         function addMember(){
             var employId = Number($("#employId").val());
             var employName = $("#employName").val();
@@ -95,7 +77,10 @@
             var phone = $("#phone").val();
             var email = assembleEmail();
             var saveName = $("#saveName").val();
-            var originalName = $("#originalName").val();
+            var originalName = $("#originalName")[0].files[0].name;
+            var fileInput = $("#originalName")[0];
+            var file = fileInput.files[0];
+            var reader = new FileReader();
 
             //유효성 검사
             //1. 이름
@@ -116,43 +101,52 @@
             }
 
             if(!regExpName.test(employName)){
-                alert("이름을 올바르게 입력해주세요")
+                alert("이름을 올바르게 입력해주세요");
                 return;
             }
             if(!regPhone.test(phone)){
-                alert("휴대폰 번호를 올바르게 입력해주세요")
+                alert("휴대폰 번호를 올바르게 입력해주세요");
                 return;
             }
 
-            var data = {
-                "employeeVo": {
-                    "employId": employId,
-                    "employName": employName,
-                    "employRank": employRank,
-                    "phone": phone,
-                    "email": email
-                },
-                "fileVo": {
-                    "saveName": saveName,
-                    "originalName": originalName
-                }
+            reader.onload = function(e) {
+                var arrayBuffer = e.target.result;
+                var bytes = new Uint8Array(arrayBuffer);
+                var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+                var encodedFile = btoa(binaryString); // Base64 인코딩
+
+                var data = {
+                    "employeeVo": {
+                        "employId": employId,
+                        "employName": employName,
+                        "employRank": employRank,
+                        "phone": phone,
+                        "email": email
+                    },
+                    "fileVo": {
+                        "saveName": saveName,
+                        "originalName": originalName,
+                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
+                    }
+                };
+
+                $.ajax({
+                    anyne:true,
+                    type:'POST',
+                    data:JSON.stringify(data),
+                    url: "${contextPath}/addEmployee",
+                    dataType : "text",
+                    contentType : 'application/json; charset=utf-8',
+                }).done(function(){
+                    console.log("성공");
+                    window.location.href = "${contextPath}/employeeDetail/"+employId;
+                }).fail(function(error){
+                    alert("실패하였습니다.");
+                    alert(JSON.stringify(error));
+                });
             };
 
-            $.ajax({
-                anyne:true,
-                type:'POST',
-                data:JSON.stringify(data),
-                url: "${contextPath}/addEmployee",
-                dataType : "text",
-                contentType : 'application/json; charset=utf-8',
-            }).done(function(){
-                console.log("성공");
-                window.location.href = "${contextPath}/employeeDetail/"+employId;
-            }).fail(function(error){
-
-                alert("실패하였습니다.")
-                alert(JSON.stringify(error));
-            })
+            reader.readAsArrayBuffer(file); // 파일을 읽고 Base64 인코딩
         }
 
         //직원 번호 입력 창 값이 변경 될 때마다 초기화 작업
@@ -294,21 +288,55 @@
                     contentType : 'application/json; charset=utf-8',
                 }).done(function(data){
                     console.log(data.employee.employName+"데이터 확인용==============")
-                    console.log(data.file.originalName+"데이터 확인용")
+                    console.log(data+"데이터 확인용==============")
+                    console.log(data.file+"데이터 확인용==============")
+                    //console.log(data.file.originalName+"데이터 확인용")
 
                     // 모달창의 input 필드에 값 설정
                     $("#employId").val(data.employee.employId);
                     $("#employName").val(data.employee.employName);
                     $("#employRank").val(data.employee.employRank);
                     $("#phone").val(data.employee.phone);
-                    $("#save_originalName").text(data.file.originalName);
-                    $("#save_saveName").text(data.file.saveName);
-                    $("#save_createAt").text(data.file.createAt);
+                    //파일 데이터가 존재하는 경우에
+                    if(data.file != null){
+                        $("#file_id").text(data.file.id);
+                        $("#save_originalName").text(data.file.originalName);
+                        $("#save_saveName").text(data.file.saveName);
+                        $("#save_createAt").text(data.file.createAt);
+                        //파일 데이터가 있는 경우에 UI
+                        $(".file_list").show();
+                    }else{
+                        //파일 데이터가 없는 경우에 UI
+                        $(".file_list").hide();
+                        $(".saved_file > h3").text("저장된 파일 데이터가 없습니다.");
+                    }
 
+                    // 이메일 주소에서 '@' 이전의 부분만 추출하여 입력 필드에 설정 - 앞부분
+                    var emailUserFront = data.employee.email.split('@')[0];
+                    $("#email").val(emailUserFront);
 
-                    // 이메일 주소에서 '@' 이전의 부분만 추출하여 입력 필드에 설정
-                    var emailUserPart = data.employee.email.split('@')[0];
-                    $("#email").val(emailUserPart);
+                    //이메일 뒷 부분
+                    var emailUserBack = data.employee.email.split('@')[1];
+                    console.log(emailUserBack+"이메일 뒷부분?")
+                    // 이메일 뒷부분 자동 세팅
+                    // 만약 select에 해당 요소가 있으면..
+                    const emailList = ["naver.com", "gmail.com", "nate.com"];
+                    if (emailList.includes(emailUserBack)) {
+                        $("#email_option").val('@' + emailUserBack).prop("selected", true);
+                        $("#email2").hide();
+                    } else {
+                        $("#email_option").val("user_input").prop("selected", true);
+                        $("#email2").val(emailUserBack).show();
+                    }
+
+                    //이메일 옵션 변경 이벤트 처리
+                    $('#email_option').change(function () {
+                        if ($(this).val() == "user_input") {
+                            $("#email2").show();
+                        } else {
+                            $("#email2").hide();
+                        }
+                    });
 
                 }).fail(function(error){
                     alert("실패하였습니다.")
@@ -318,7 +346,10 @@
             }
 
         }
-
+        function getFileName(originalName) {
+            // 파일 경로를 분리하여 배열로 만든 후, 마지막 요소를 반환하여 파일 이름만 추출
+            return originalName.split('\\').pop().split('/').pop();
+        }
         // 직원 수정 모달 - 수정 버튼
         function modifyMember(){
             var employId = Number($("#employId").val());
@@ -328,6 +359,12 @@
             var email = assembleEmail();
             var saveName = $("#saveName").val();
             var originalName = $("#originalName").val();
+            originalName = getFileName(originalName);
+            var fileInput = $("#originalName")[0];
+            var file = fileInput.files[0];
+            var reader = new FileReader();
+
+
 
             //사용 불가 혹은 인증을 하지 않은 경우에...
             if($("#checkResult").text() == '사용불가' ||$("#checkResult").text() == ''){
@@ -351,36 +388,67 @@
             }
 
 
-            var data = {
-                "employeeVo":{
-                    "id":employId,
-                    "employId" : employId,
-                    "employName" : employName,
-                    "employRank" : employRank,
-                    "phone" : phone,
-                    "email" : email
-                },
-                "fileVo": {
-                    "saveName": saveName,
-                    "originalName": originalName
-                }
-            }
+            reader.onload = function(e) {
+                var arrayBuffer = e.target.result;
+                var bytes = new Uint8Array(arrayBuffer);
+                var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+                var encodedFile = btoa(binaryString); // Base64 인코딩
 
+                var data = {
+                    "employeeVo": {
+                        "employId": employId,
+                        "employName": employName,
+                        "employRank": employRank,
+                        "phone": phone,
+                        "email": email
+                    },
+                    "fileVo": {
+                        "saveName": saveName,
+                        "originalName": originalName,
+                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
+                    }
+                };
+                $.ajax({
+                    anyne:true,
+                    type:'POST',
+                    data:JSON.stringify(data),
+                    url: "${contextPath}/modifyEmploy/"+employId,
+                    dataType : "text",
+                    contentType : 'application/json; charset=utf-8',
+                }).done(function(){
+                    console.log("성공");
+                    location.href='${contextPath}/';
+
+
+                }).fail(function(error){
+                    alert("실패하였습니다.")
+                    alert(JSON.stringify(error));
+                })
+
+            };
+
+            reader.readAsArrayBuffer(file);
+
+        }
+
+        //직원 수정 모달 - 파일 삭제
+        function deleteFile(){
+            let id = $("#file_id").text();
             $.ajax({
-                anyne:true,
-                type:'POST',
-                data:JSON.stringify(data),
-                url: "${contextPath}/modifyEmploy/"+employId,
-                dataType : "text",
-                contentType : 'application/json; charset=utf-8',
-            }).done(function(){
-                console.log("성공");
-                location.href='${contextPath}/';
-
-
-            }).fail(function(error){
-                alert("실패하였습니다.")
-                alert(JSON.stringify(error));
+                url: "${contextPath}/fileDelete/"+id,
+                type: 'POST',
+                async: false,
+                success: function (data){
+                    console.log(data)
+                    $("#file_id").text("");
+                    $("#save_originalName").text("");
+                    $("#save_saveName").text("");
+                    $("#save_createAt").text("");
+                    alert("파일이 삭제되었습니다.")
+                },
+                error: function (e){
+                    alert(e);
+                }
             })
         }
 
@@ -507,11 +575,11 @@
             <div class="inner">
                 <p class="title"> </p>
                 <div>
-                    <form action="" method ="post">
+                    <form >
                         <div>
                             <label>직원번호</label>
                             <input type="number" id="employId" placeholder="직원번호를 입력하세요" onchange="employeeIdChange()">
-                            <button id="phone_check" onclick="idCheck()">중복체크</button>
+                            <button id="phone_check" onclick="idCheck(event)">중복체크</button>
                             <span id="checkResult"></span>
                         </div>
                         <div>
@@ -546,8 +614,8 @@
                     <div class="file_upload">
                         <p>직원 파일 업로드</p>
                         <form>
-                            <label>파일 이름 : </label>
-                            <input id="saveName" type="text" placeholder="저장할 파일명을 입력해주세요" required>
+                            <%--<label>파일 이름 : </label>
+                            <input id="saveName" type="text" placeholder="저장할 파일명을 입력해주세요" required>--%>
 
                             <label> 업로드할 파일 : </label>
                             <input id="originalName" type="file" placeholder="저장할 파일명을 올려주세요" value="original_name" required>
@@ -557,11 +625,14 @@
                     <%--저장된 파일 출력--%>
                     <div class="saved_file">
                         <h3>저장된 파일</h3>
-                        <div>
-                            <p>파일 이름 : <span id="save_saveName">${file.saveName}</span></p>
-                            <p>파일 원본이름 : <span id="save_originalName">${file.originalName}</span></p>
-                            <p>파일 등록일 : <span id="save_createAt">${file.createAt}</span></p>
+                        <div class="file_list">
+                            <p>파일 아이디 : <span id="file_id"></span></p>
+                            <p>파일 이름 : <span id="save_saveName"></span></p>
+                            <p>파일 원본이름 : <span id="save_originalName"></span></p>
+                            <p>파일 등록일 : <span id="save_createAt"></span></p>
                         </div>
+
+                        <button class="deleteFile" onclick="deleteFile()">파일삭제</button>
                     </div>
 
                     <button type="button" id="addMember" onclick="addMember()">직원등록</button>
@@ -597,7 +668,6 @@
                 $('#pageSize').val(pageSize);
                 $('#pageSize').val(pageSize).prop("selected",true);
                 var test =  $('#pageSize').val(pageSize);
-                debugger
                 console.log("페이징 사이즈"+test);
             }
             if (keyword) {
@@ -659,9 +729,7 @@
         function pageChange(pageNum) {
             $('input[name="pageIndex"]').val(pageNum);
 
-           debugger
             console.log($('input[name="pageSize"]').val())
-            debugger
             $('#searchForm').submit();
         }
 
@@ -679,7 +747,6 @@
         });
 
         $('#keyword, #category').change(function (){
-            debugger
             $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
         })
         // 페이지 로드 시 폼 필드를 설정
@@ -729,6 +796,23 @@
         $('#category').trigger('change');
 
     });
+
+    // 직원 상세 조회
+    function detail(id){
+        $.ajax({
+            anyne:true,
+            type:'GET',
+            url: "${contextPath}/employeeDetail/"+id,
+        }).done(function(){
+            console.log("성공");
+            window.location.href = "${contextPath}/employeeDetail/"+id;
+        }).fail(function(error){
+            console.log(id, "아이디")
+            alert("실패하였습니다.", id)
+            alert(JSON.stringify(error));
+        })
+
+    }
 
 
 
