@@ -8,11 +8,13 @@ import lombok.ToString;
 import org.apache.ibatis.type.Alias;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
 @Alias("JoinRequestDto")
 public class JoinRequestDto {
     private EmployeeVo employeeVo;
-    private FileVo fileVo;
+    private List<FileVo> fileVo;
 }

@@ -9,7 +9,6 @@
         values (#{employId}, #{originalName}, #{saveName}, #{savePath},now())
     </insert>
 
-
     <!--파일 조회-->
     <select id="selectFileByEmployId" resultType="com.example.employee_system.bean.dto.FileDto">
         select * from file where EMPLOY_ID = #{id}
@@ -18,6 +17,11 @@
     <!--파일 조회(pk 정보를 가지고)-->
     <select id="selectFileById" resultType="com.example.employee_system.bean.dto.FileDto">
         select * from file where id = #{id}
+    </select>
+
+    <!--파일 리스트 조회 -->
+    <select id="selectFileListByEmployId" resultType="com.example.employee_system.bean.dto.FileDto">
+        SELECT * FROM FILE WHERE EMPLOY_ID = #{employId}
     </select>
 
     <!--파일 수정-->

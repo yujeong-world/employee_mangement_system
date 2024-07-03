@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,11 @@ public class FileService {
     // 직원 파일 조회
     public FileDto getFileByEmployId(Long id) {
         return fileMapper.selectFileByEmployId(id);
+    }
+
+    // 직원 파일 리스트 조회
+    public List<FileDto> getFileListByEmployId(Long employId) {
+        return fileMapper.selectFileListByEmployId(employId);
     }
 
     //파일 정보 조회(pk를 가지고)
