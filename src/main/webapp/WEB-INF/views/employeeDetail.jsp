@@ -88,34 +88,14 @@
 
     <div>
         <h3>저장된 파일</h3>
-        <div>
-            <p>파일 이름 : <span>${file.saveName}</span></p>
-            <p>파일 아이디 : <span>${file.id}</span></p>
-            <p>파일 원본이름 : <span>${file.originalName}</span></p>
+        <c:forEach items="${fileList}" var="file">
+            <p>파일 이름 : <span>${file.originalName}</span></p>
             <p>파일 등록일 : <span>${file.createAt}</span></p>
-        </div>
-        <!-- Display File Information -->
-        <c:if test="${file != null}">
-            <a href="${pageContext.request.contextPath}/download/${file.id}">${file.saveName}</a>
-        </c:if>
+            <%--파일 다운로드--%>
+            <a href="${pageContext.request.contextPath}/download/${file.id}">${file.originalName}</a>
+        </c:forEach>
 
-        <button id="delete_file">파일 삭제</button>
     </div>
-
-    <%--파일 업로드 영역--%>
-    <%--<div>
-        <p>직원 파일 업로드</p>
-        <form>
-            <label>파일 이름 : </label>
-            <input id="save_name" type="text" placeholder="저장할 파일명을 입력해주세요">
-
-            <label> 업로드할 파일 : </label>
-            <input id="original_name" type="file" placeholder="저장할 파일명을 올려주세요" value="original_name">
-
-            <button type="submit" onclick="saveFile()">파일 저장하기 버튼</button>
-        </form>
-    </div>--%>
-
 
 
     <button id="return_main">메인페이지로 돌아가기</button>

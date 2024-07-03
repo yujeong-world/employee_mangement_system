@@ -8,6 +8,7 @@ import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.service.EmployeeService;
 //import jakarta.servlet.http.HttpServletRequest;
 import com.example.employee_system.service.FileService;
+import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -75,12 +76,21 @@ public class EmployeeController {
         mav.setViewName("employeeDetail");
 
         // 직원 파일 조회
-        //1. 직원 pk 조회
+        //1. 직원 조회
         EmployeeDto employee = employeeService.employee(employId);
         mav.addObject("employee", employee);
+
+        // 2. 직원 파일 정보 조회
+        //파일이 없는 경우도 고려,
         Long id = employee.getId();
-        FileDto fileDto = fileService.getFileByEmployId(id);
-        mav.addObject("file", fileDto);
+        //FileDto file = fileService.getFileByEmployId(id);
+        List<FileDto> fileList = fileService.getFileListByEmployId(id);
+        //먼저 파일이 있는지 조회하고, 있으면 파일을 넘김
+        if(fileList != null){
+            mav.addObject("fileList", fileList);
+        }
+        //System.out.println("직원 상세 조회 test: "+file.toString());
+        System.out.println("직원 상세 조회 test employee: "+employee);
 
 
         return mav;
@@ -100,12 +110,13 @@ public class EmployeeController {
             Long id = employeeDto.getId();
             int employId = request.getEmployeeVo().getEmployId();
 
-            // 파일 정보에 직원 ID를 설정합니다.
-            request.getFileVo().setEmployId(id);
-
             // 파일을 저장
-            byte[] fileBytes = Base64.getDecoder().decode(request.getFileVo().getFileData());
-            fileService.fileSave(request.getFileVo(), fileBytes);
+            // 리스트
+            for(FileVo file : request.getFileVo()){
+                byte[] fileBytes = Base64.getDecoder().decode(file.getFileData());
+                file.setEmployId(id);
+                fileService.fileSave(file, fileBytes);
+            }
 
             return ResponseEntity.ok("Employee created successfully");
         } catch (Exception e) {
@@ -136,7 +147,7 @@ public class EmployeeController {
 
 
     // 직원 수정
-    @PostMapping("/modifyEmploy/{employId}")
+   /* @PostMapping("/modifyEmploy/{employId}")
     @ResponseBody
     public ResponseEntity<String> modifyEmployee(@PathVariable("employId") int employId, @RequestBody JoinRequestDto joinRequestDto) {
         try {
@@ -159,7 +170,7 @@ public class EmployeeController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error: " + e.getMessage());
         }
-    }
+    }*/
 
 
     // 수정할 직원 조회하기
@@ -171,7 +182,7 @@ public class EmployeeController {
 
         // 수정할 직원 조회 - 파일 조회
         Long eid = employee.getId();
-        FileDto file = fileService.getFileByEmployId(eid);
+        List<FileDto> file = fileService.getFileListByEmployId(eid);
         System.out.println("콘솔 테스트 : 직원 수정" + file);
 
         // JoinRequestDto 객체 생성
@@ -180,7 +191,7 @@ public class EmployeeController {
         response.setEmployee(employee);
         //먼저 파일이 있는지 조회하고, 있으면 파일을 넘김
         if(file != null ){
-            response.setFile(file);
+            response.setFile((List<FileDto>) file);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

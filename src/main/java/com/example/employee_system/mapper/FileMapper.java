@@ -4,6 +4,8 @@ import com.example.employee_system.bean.dto.FileDto;
 import com.example.employee_system.vo.FileVo;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface FileMapper {
     // 파일 정보 조회
@@ -23,5 +25,7 @@ public interface FileMapper {
 
     //파일 경로 수정하기
     void updateFilePath(long id, String filePath);
+
+    List<FileDto> selectFileListByEmployId(Long employId);
 }
 
