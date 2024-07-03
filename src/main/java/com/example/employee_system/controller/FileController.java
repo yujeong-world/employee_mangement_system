@@ -68,7 +68,7 @@ public class FileController {
    //파일 다운로드
     @GetMapping("/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") String fileId) throws IOException {
-        //파일 아이디 long 타입으로 변경하기
+        //파일 아이디 long 타입으로 변경하기ㄹ
         long id = Long.parseLong(fileId);
 
         //경로 확인하기

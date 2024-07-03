@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.IIOException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -81,8 +82,23 @@ public class FileService {
     //파일 삭제하기
     @Transactional
     public void deleteFile(Long id){
+        // 1. 디스크 파일 데이터 삭제
+        // 1-1. 파일 데이터의 경로 조회
+        FileDto fileDto = getFileById(id);
+        String filePath = fileDto.getSavePath()+"/"+fileDto.getSaveName();
+        System.out.println("파일 삭제 경로 확인 : "+ filePath);
+        deleteFileFromDisk(filePath);
 
+        // 2. db 파일 데이터 삭제
         fileMapper.deleteFileById(id);
+    }
+
+    //파일 삭제 (from Disk) - 물리적 삭제
+    public void deleteFileFromDisk(String filePath){
+        File file = new File(filePath);
+        if(file.exists()){
+            file.delete();
+        }
     }
 
     //파일 수정하기
