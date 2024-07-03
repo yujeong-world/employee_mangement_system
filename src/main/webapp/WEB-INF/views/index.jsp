@@ -614,8 +614,8 @@
                     <div class="file_upload">
                         <p>직원 파일 업로드</p>
                         <form>
-                            <label>파일 이름 : </label>
-                            <input id="saveName" type="text" placeholder="저장할 파일명을 입력해주세요" required>
+                            <%--<label>파일 이름 : </label>
+                            <input id="saveName" type="text" placeholder="저장할 파일명을 입력해주세요" required>--%>
 
                             <label> 업로드할 파일 : </label>
                             <input id="originalName" type="file" placeholder="저장할 파일명을 올려주세요" value="original_name" required>

@@ -25,7 +25,8 @@
         update file
         set ORIGINAL_NAME =  #{originalName},
             SAVE_NAME = #{saveName},
-            CREATE_AT = now()
+            CREATE_AT = now(),
+            SAVE_PATH = #{savePath}
         where EMPLOY_ID = #{employId}
     </update>
 

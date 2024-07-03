@@ -68,13 +68,13 @@ public class FileController {
    //파일 다운로드
     @GetMapping("/download/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") String fileId) throws IOException {
-
+        //파일 아이디 long 타입으로 변경하기
         long id = Long.parseLong(fileId);
 
         //경로 확인하기
         FileDto fileDto = fileService.getFileById(id);
         String path = fileDto.getSavePath();
-        String fileName = fileDto.getOriginalName();
+        String fileName = fileDto.getSaveName();
 
         File file = new File(path + "/"+fileName);
         if (!file.exists()) {
@@ -83,7 +83,8 @@ public class FileController {
 
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         HttpHeaders headers = new HttpHeaders();
-        String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
+        String originalName = fileDto.getOriginalName();
+        String encodedFileName = URLEncoder.encode(originalName, StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedFileName);
 
 

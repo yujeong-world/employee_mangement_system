@@ -96,6 +96,7 @@ public class EmployeeController {
 
             // 직원 정보를 저장한 후에 직원 ID를 가져옵니다.
             EmployeeDto employeeDto = employeeService.employee(request.getEmployeeVo().getEmployId());
+
             Long id = employeeDto.getId();
             int employId = request.getEmployeeVo().getEmployId();
 
@@ -142,17 +143,16 @@ public class EmployeeController {
             // 기본 정보 수정
             employeeService.modifyEmployee(joinRequestDto.getEmployeeVo());
 
-            // 파일 수정
-            EmployeeDto employeeDto = employeeService.employee(employId);
-            Long id = employeeDto.getId();
-            joinRequestDto.getFileVo().setEmployId(id);
-
-
             // Base64 디코딩
             byte[] fileBytes = Base64.getDecoder().decode(joinRequestDto.getFileVo().getFileData());
 
+            //직원 pk키 조회
+            EmployeeDto employeeDto = employeeService.getEmployById(joinRequestDto.getEmployeeVo().getEmployId());
+            Long id = employeeDto.getId();
+            joinRequestDto.getFileVo().setEmployId(id);
+
             // 파일 수정 메서드 호출
-            fileService.fileModify(joinRequestDto.getFileVo(), fileBytes);
+            fileService.fileSave(joinRequestDto.getFileVo(), fileBytes);
 
             return ResponseEntity.ok("success");
         } catch (Exception e) {
