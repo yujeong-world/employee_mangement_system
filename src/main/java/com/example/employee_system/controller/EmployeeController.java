@@ -145,34 +145,6 @@ public class EmployeeController {
         return new ModelAndView("redirect:/");
     }
 
-
-    // 직원 수정
-   /* @PostMapping("/modifyEmploy/{employId}")
-    @ResponseBody
-    public ResponseEntity<String> modifyEmployee(@PathVariable("employId") int employId, @RequestBody JoinRequestDto joinRequestDto) {
-        try {
-            // 기본 정보 수정
-            employeeService.modifyEmployee(joinRequestDto.getEmployeeVo());
-
-            // Base64 디코딩
-            byte[] fileBytes = Base64.getDecoder().decode(joinRequestDto.getFileVo().getFileData());
-
-            //직원 pk키 조회
-            EmployeeDto employeeDto = employeeService.getEmployById(joinRequestDto.getEmployeeVo().getEmployId());
-            Long id = employeeDto.getId();
-            joinRequestDto.getFileVo().setEmployId(id);
-
-            // 파일 수정 메서드 호출
-            fileService.fileSave(joinRequestDto.getFileVo(), fileBytes);
-
-            return ResponseEntity.ok("success");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error: " + e.getMessage());
-        }
-    }*/
-
-
     // 수정할 직원 조회하기
     @GetMapping("/modifyEmploy/{id}")
     public ResponseEntity<RequestDto> modifyEmployInfo(@PathVariable("id") int id) {
