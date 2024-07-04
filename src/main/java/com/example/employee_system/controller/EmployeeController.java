@@ -8,6 +8,7 @@ import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.service.EmployeeService;
 //import jakarta.servlet.http.HttpServletRequest;
 import com.example.employee_system.service.FileService;
+import com.example.employee_system.vo.EmployeeVo;
 import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
 import org.springframework.http.HttpStatus;
@@ -168,6 +169,40 @@ public class EmployeeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    @PostMapping("/modifyEmploy/{employId}")
+    @ResponseBody
+    public ResponseEntity<String> modifyEmployee(@PathVariable("employId") int employId, @RequestBody JoinRequestDto joinRequestDto) {
+        try {
+            // 기본 정보 수정
+            employeeService.modifyEmployee(joinRequestDto.getEmployeeVo());
+
+            //pk 받기
+            EmployeeDto employeeDto = employeeService.employee(employId);
+            Long id = employeeDto.getId();
+
+            //파일 저장
+            for(FileVo file : joinRequestDto.getFileVo()){
+                byte[] fileBytes = Base64.getDecoder().decode(file.getFileData());
+                file.setEmployId(id);
+                fileService.fileSave(file, fileBytes);
+            }
+
+            //직원 pk키 조회
+            /*EmployeeDto employeeDto = employeeService.getEmployById(joinRequestDto.getEmployeeVo().getEmployId());
+            Long id = employeeDto.getId();
+            joinRequestDto.getFileVo().setEmployId(id);*/
+
+            // 파일 수정 메서드 호출
+            //fileService.fileSave(joinRequestDto.getFileVo(), fileBytes);
+
+            return ResponseEntity.ok("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error: " + e.getMessage());
+        }
+
+    }
     //게시판 검색 기능
     @GetMapping("/search")
     public ModelAndView getEmployeeListBySearch(
