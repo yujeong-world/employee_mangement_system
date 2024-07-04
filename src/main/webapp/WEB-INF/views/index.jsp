@@ -401,8 +401,6 @@
             var file = fileInput.files;
             var reader = new FileReader();
 
-
-
             //사용 불가 혹은 인증을 하지 않은 경우에...
             if($("#checkResult").text() == '사용불가' ||$("#checkResult").text() == ''){
                 alert("직원 번호를 확인해주세요");
@@ -520,6 +518,28 @@
             $(element).closest('.file_upload_form').remove();
         }
 
+        //메일 발송하기
+        function mailSubmit(employId){
+
+            data = {"employId" : Number(employId)};
+            console.log(employId+"메일 발송 test");
+            console.log(typeof employId+"메일 발송 test");
+            debugger
+            $.ajax({
+                url: "${contextPath}/email",
+                type: 'POST',
+                data:{ employId : Number(employId) },
+                async: false,
+                success: function (data){
+                    console.log(data)
+                    alert("메일을 발송했습니다. 메일을 확인해주세요.");
+                },
+                error: function (e){
+                    alert(e);
+                }
+            })
+        }
+
 
 
 
@@ -528,16 +548,15 @@
 
 <body>
 <div id="listInfo">
-    <h3><a href="${contextPath}">직원 리스트</a></h3>
-    <div class="btn_area">
-        <button id="add_btn">등록</button>
-        <button id="modify_btn" onclick="modifyEmployInfo()">수정</button>
-        <button onclick="deleteemploy()">삭제</button>
-    </div>
+    <h3><a href="${contextPath}">직원 목록</a></h3>
+    <div class="table_top_container">
+        <div class="btn_area">
+            <button id="add_btn">등록</button>
+            <button id="modify_btn" onclick="modifyEmployInfo()">수정</button>
+            <button onclick="deleteemploy()">삭제</button>
+        </div>
 
-    <div class="form_area">
-
-
+        <div class="form_area">
             <form id="searchForm" action="${contextPath}" method="GET">
                 <select name="category" id="category">
                     <option value="name">직원명</option>
@@ -559,8 +578,11 @@
                 <input readonly name="pageSize" type="hidden">
                 <button type="submit">검색</button>
             </form>
-
+        </div>
     </div>
+
+
+
     <div>
 
         <div>
@@ -573,6 +595,7 @@
                     <th>직급</th>
                     <th>전화번호</th>
                     <th>이메일</th>
+                    <th>직원정보 메일발송</th>
 
                 </tr>
                 </thead>
@@ -595,6 +618,7 @@
                         <td>${list.employRank}</td>
                         <td>${list.phone}</td>
                         <td>${list.email}</td>
+                        <td><button id="mail_submit" onclick="mailSubmit(${list.employId})">메일 발송하기</button></td>
                     </tr>
                 </c:forEach>
                 </tbody>

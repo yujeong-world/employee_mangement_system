@@ -57,3 +57,11 @@ th, td {
     margin: auto;
     width: 50%;
 }
+.table_top_container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.table_top_container .btn_area{
+
+}
