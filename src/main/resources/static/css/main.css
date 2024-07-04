@@ -41,11 +41,12 @@ th, td {
     padding: 10px;
 }
 .page_area ul{
-
+    padding: 0;
 }
 .page_area ul li{
     list-style-type: none;
     display: inline;
+    float: left;
 }
 .form_area{
     margin: 10px;
@@ -64,4 +65,37 @@ th, td {
 }
 .table_top_container .btn_area{
 
+}
+/*상단 버튼*/
+.table_top_container .btn_area{
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.table_top_container .btn_area button{
+    width: 30%;
+}
+.form_area #searchForm select{
+    height: 30px;
+}
+.form_area #searchForm input{
+    height: 24px;
+}
+.form_area #searchForm{
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+.form_area{
+    width: 53%;
+}
+#searchForm button{
+    height: 30px;
+}
+a{
+    text-decoration: none;
+}
+.font-red{
+    color: red;
 }

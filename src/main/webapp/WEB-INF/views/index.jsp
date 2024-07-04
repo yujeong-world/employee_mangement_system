@@ -10,26 +10,63 @@
 
     <meta charset="UTF-8">
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/main.css?after">
+    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap-grid.min.css">
 <%--      제이쿼리 --%>
     <script type="text/javascript" src="${contextPath}/static/lib/jquery-3.6.3.min.js"></script>
+    <script type="text/javascript" src="${contextPath}/static/js/bootstrap.js"></script>
 
 
 </head>
 
 <body>
+
 <div id="listInfo">
+
+   <%-- <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">직원 관리 시스템</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Pricing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>--%>
     <h3><a href="${contextPath}">직원 목록</a></h3>
     <div class="table_top_container">
         <div class="btn_area">
-            <button id="add_btn">등록</button>
-            <button id="modify_btn" onclick="modifyEmployInfo()">수정</button>
-            <button onclick="deleteemploy()">삭제</button>
+            <button id="add_btn" class="btn btn-outline-primary" >등록</button>
+            <button id="modify_btn" onclick="modifyEmployInfo()" class="btn btn-outline-secondary">수정</button>
+            <button onclick="deleteemploy()" class="btn btn-outline-dark">삭제</button>
         </div>
 
         <div class="form_area">
             <form id="searchForm" action="${contextPath}" method="GET">
-                <select name="category" id="category">
+                <%--<select name="category" id="category">
+                    <option value="name">직원명</option>
+                    <option value="id">직원 번호</option>
+                    <option value="rank">직급</option>
+                    <option value="phone">전화번호</option>
+                    <option value="email">이메일</option>
+                </select>--%>
+                <%--부트스트랩수정--%>
+                <select class="form-select" name="category" id="category" aria-label="Default select example">
                     <option value="name">직원명</option>
                     <option value="id">직원 번호</option>
                     <option value="rank">직급</option>
@@ -47,7 +84,7 @@
                 <input id="keyword" type="text" name="keyword" placeholder="검색어를 입력하세요." value="${param.keyword}" required>
                 <input readonly name="pageIndex" type="hidden">
                 <input readonly name="pageSize" type="hidden">
-                <button type="submit">검색</button>
+                <button type="submit" class="btn btn-outline-secondary">검색</button>
             </form>
         </div>
     </div>
@@ -101,9 +138,8 @@
             총 ${totalCount} 건
         </div>
 
+        <%--페이지 바--%>
         <div class="page_area">
-            <p>페이지 바</p>
-
             <ul>
                 <c:forEach begin="1" end="${pageBar}" var="pageNum">
                     <li><a href="javascript:void(0);" class="page-link" data-page="${pageNum}">${pageNum}</a></li>
