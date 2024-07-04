@@ -14,536 +14,7 @@
 <%--      제이쿼리 --%>
     <script type="text/javascript" src="${contextPath}/static/lib/jquery-3.6.3.min.js"></script>
 
-    <script type="text/javascript">
 
-        //직원 번호 중복 체크
-        function idCheck(event){
-            event.preventDefault(); // 폼의 기본 제출 이벤트 막기
-            let employIdForm = $("#employId").val();
-            if(employIdForm != employId){
-
-            }
-            $.ajax({
-                type: 'GET',
-                url: '${contextPath}/idCheck',
-                data: { id: employIdForm },
-                dataType: 'text',
-                contentType: 'application/json; charset=utf-8',
-            }).done(function(response) {
-                console.log(response + ' 리턴 체크');
-                if (response === 'Vaild') {
-
-                    alert('사용 가능한 직원번호입니다.');
-                    $("#checkResult").text('사용가능');
-                } else {
-                    if(employIdForm == employId){
-                        alert('사용 가능한 직원번호입니다.');
-                        $("#checkResult").text('사용가능');
-                    }else {
-                        alert('이미 사용 중인 직원번호입니다.');
-                        $("#checkResult").text('사용불가');
-                    }
-
-                }
-            }).fail(function(error) {
-                alert('오류가 발생하였습니다.');
-                console.error(JSON.stringify(error));
-            });
-
-            // 기본 이벤트 동작 막기
-            return false;
-        }
-
-        function validateEmail(email) {
-            var regEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-            return regEmail.test(email);
-        }
-
-        function validateName(name) {
-            var regName = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
-            return regName.test(name);
-        }
-
-        function validatePhone(phone) {
-            var regName = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
-            return regName.test(phone);
-        }
-
-        //직원 등록
-        function addMember() {
-            var employId = Number($("#employId").val());
-            var employName = $("#employName").val();
-            var employRank = $("#employRank").val();
-            var phone = $("#phone").val();
-            var email = assembleEmail();
-            var saveName = $("#saveName").val();
-
-            // 유효성 검사
-            var regExpName = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
-            var regPhone = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
-
-            if ($("#checkResult").text() == '사용불가' || $("#checkResult").text() == '') {
-                alert("직원 번호를 확인해주세요");
-                return;
-            }
-
-            if (!validateEmail(email)) {
-                alert("이메일을 올바르게 입력해주세요.");
-                return;
-            }
-
-            if (!regExpName.test(employName)) {
-                alert("이름을 올바르게 입력해주세요");
-                return;
-            }
-
-            if (!regPhone.test(phone)) {
-                alert("휴대폰 번호를 올바르게 입력해주세요");
-                return;
-            }
-
-            var formData = {
-                "employeeVo": {
-                    "employId": employId,
-                    "employName": employName,
-                    "employRank": employRank,
-                    "phone": phone,
-                    "email": email
-                },
-                "fileVo": []
-            };
-
-            // 파일 데이터 추가
-            var filesProcessed = 0;
-            var totalFiles = $(".file_upload_form input[type='file']").length;
-
-            $(".file_upload_form input[type='file']").each(function(index, fileInput) {
-                var file = fileInput.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        var arrayBuffer = e.target.result;
-                        var bytes = new Uint8Array(arrayBuffer);
-                        var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
-                        var encodedFile = btoa(binaryString); // Base64 인코딩
-
-                        formData.fileVo.push({
-                            "saveName": saveName,
-                            "originalName": file.name,
-                            "fileData": encodedFile // Base64 인코딩된 파일 데이터
-                        });
-
-                        filesProcessed++;
-                        if (filesProcessed === totalFiles) {
-                            // 모든 파일이 처리되면 AJAX 요청을 보냅니다.
-                            $.ajax({
-                                type: 'POST',
-                                data: JSON.stringify(formData),
-                                url: "${contextPath}/addEmployee",
-                                dataType: "text",
-                                contentType: 'application/json; charset=utf-8',
-                            }).done(function() {
-                                console.log("성공");
-                                window.location.href = "${contextPath}/employeeDetail/" + employId;
-                            }).fail(function(error) {
-                                alert("실패하였습니다.");
-                                alert(JSON.stringify(error));
-                            });
-                        }
-                    };
-                    reader.readAsArrayBuffer(file); // 파일을 읽고 Base64 인코딩
-                } else {
-                    filesProcessed++;
-                }
-            });
-
-            // 파일이 없을 경우에도 폼 데이터를 전송합니다.
-            if (totalFiles === 0) {
-                $.ajax({
-                    type: 'POST',
-                    data: JSON.stringify(formData),
-                    url: "${contextPath}/addEmployee",
-                    dataType: "text",
-                    contentType: 'application/json; charset=utf-8',
-                }).done(function() {
-                    console.log("성공");
-                    window.location.href = "${contextPath}/employeeDetail/" + employId;
-                }).fail(function(error) {
-                    alert("실패하였습니다.");
-                    alert(JSON.stringify(error));
-                });
-            }
-        }
-
-
-        //직원 번호 입력 창 값이 변경 될 때마다 초기화 작업
-        function employeeIdChange(){
-            $("#checkResult").text('');
-        }
-
-        function assembleEmail() {
-            var emailUser = $("#email").val();
-            var domain = $("#email_option").val();
-            if (domain === "user_input") {
-                domain = $("#email2").val();
-            }
-            return emailUser + domain;
-        }
-
-
-        $(document).ready(function() {
-            $("#email_option").change(function() {
-                if ($(this).val() == "user_input") {
-                    $("#email2").show();
-                } else {
-                    $("#email2").hide();
-                }
-            });
-        });
-
-
-        let employId = '';
-
-        //여러개의 체크박스 값들의 상태값을 가져오는 방법
-        var chk_arr = [];
-        $("input[name=option]:checked").each(function (){
-            var chk = $(this).val();
-            chk_arr.push(chk);
-        })
-
-        // 수정 --------
-        var check_set = new Set();
-        function getCheckValue(event){
-
-            $("input[name=option]:checked").each(function (){
-                var chk = $(this).val();
-                check_set.add(chk);
-            })
-
-            if(!event.target.checked) {
-                check_set.delete(event.target.value);
-            }
-
-            employId = event.target.value;
-            console.log("현재 선택한 체크박스는 : "+employId);
-            console.log(check_set+": 집합 /// 체크리스트 배열 확인용, set의 길이:"+check_set.size);
-        }
-
-        function checkBox(currentCheckBox){
-            const checkBoxs = document.getElementsByName("option");
-
-            console.log(checkBoxs.length+'체크박스 길이 테스트');
-            let checkedCount = 0;
-            employId = currentCheckBox.value
-            for(let i =0; i<checkBoxs.length; i++){
-                if(checkBoxs[i].checked){
-                    checkedCount++;
-                    if(checkBoxs[i] !== currentCheckBox){
-                        checkBoxs[i].checked =
-                            false;
-                        employId = currentCheckBox.value
-                        console.log("체크박스 이벤트테스트", employId)
-                    }
-                }
-            }
-
-            if (checkedCount === 0) {
-                currentCheckbox.checked = true;
-
-            }
-
-            console.log("체크박스 이벤트테스트", employId)
-        }
-
-
-        function deleteemploy() {
-            var checkedIds = Array.from(check_set);
-
-            if (checkedIds.length === 0) {
-                alert("삭제할 직원을 최소 한 명 이상 선택해주세요.");
-                return;
-            }
-
-            $.ajax({
-                type: 'POST',
-                url: "${contextPath}/deleteEmploy",
-                data: JSON.stringify(checkedIds),
-                contentType: 'application/json; charset=utf-8',
-            }).done(function() {
-                alert("성공적으로 삭제되었습니다.");
-                location.reload();
-            }).fail(function(error) {
-                alert("실패하였습니다.");
-                console.log(checkedIds + "체크 아이디 확인용")
-                console.error(JSON.stringify(error));
-            });
-        }
-
-        // 수정 버튼 클릭 이벤트 연결
-        $('.modify_btn').click(function() {
-            var employId = $(this).data('employId'); // 버튼에 데이터 속성으로 저장된 직원 ID를 가져옵니다.
-            modifyEmployInfo(employId); // 직원 정보 수정 함수 호출
-        });
-
-       //직원 수정
-        function modifyEmployInfo(){
-            console.log(employId + "직원 아이디 테스트 입니다.");
-
-            var checkedIds = Array.from(check_set);
-
-            if (checkedIds.length === 0) {
-                alert("수정할 직원을 한명만 선택해주세요.");
-                return;
-            } else if (checkedIds.length > 1) {
-                alert("수정할 직원을 한명만 선택해주세요.");
-                return;
-            } else {
-                $(".title").text("직원 수정");
-                $("#add_modal").show();
-                $('#modifyMember').show();
-                $('#addMember').hide();
-                $(".saved_file").show();
-
-                // 수정할 직원 정보를 가져오기.
-                $.ajax({
-                    anyne: true,
-                    type: 'GET',
-                    data: JSON.stringify(employId),
-                    url: "${contextPath}/modifyEmploy/" + employId,
-                    dataType: "json",
-                    contentType: 'application/json; charset=utf-8',
-                }).done(function(data) {
-                    console.log(data.employee.employName + "데이터 확인용==============");
-                    console.log(data + "데이터 확인용==============");
-                    console.log(data.file + "데이터 확인용==============");
-
-                    // 모달창의 input 필드에 값 설정
-                    $("#employId").val(data.employee.employId);
-                    $("#employName").val(data.employee.employName);
-                    $("#employRank").val(data.employee.employRank);
-                    $("#phone").val(data.employee.phone);
-
-                    // 기존 파일 리스트 초기화
-                    $(".saved_file .file_list").empty();
-
-                    // 파일 데이터가 존재하는 경우에
-                    if (data.file && data.file.length > 0) {
-                        console.log(data.file +'test==')
-                        data.file.forEach(function(file) {
-                            console.log(file)
-
-                            var fileHtml = `
-                        <div class="file_item_`+file.id+`">
-                            <p>파일 아이디: <span>`+file.id+`</span></p>
-                            <p>파일 원본이름: <span>`+file.originalName+`</span></p>
-                            <p>파일 등록일: <span>`+file.createAt+`</span></p>
-                            <button class="deleteFile" onclick="deleteFile(`+file.id+`)">-파일삭제-</button>
-                        </div>`;
-                            $(".saved_file .file_list").append(fileHtml);
-                        });
-
-                        // 파일 데이터가 있는 경우에 UI
-                        $(".file_list").show();
-                    } else {
-                        // 파일 데이터가 없는 경우에 UI
-                        $(".file_list").hide();
-                        $(".saved_file > h3").text("저장된 파일 데이터가 없습니다.");
-                    }
-
-                    // 이메일 주소에서 '@' 이전의 부분만 추출하여 입력 필드에 설정 - 앞부분
-                    var emailUserFront = data.employee.email.split('@')[0];
-                    $("#email").val(emailUserFront);
-
-                    // 이메일 뒷 부분
-                    var emailUserBack = data.employee.email.split('@')[1];
-                    console.log(emailUserBack + "이메일 뒷부분?");
-                    // 이메일 뒷부분 자동 세팅
-                    const emailList = ["naver.com", "gmail.com", "nate.com"];
-                    if (emailList.includes(emailUserBack)) {
-                        $("#email_option").val('@' + emailUserBack).prop("selected", true);
-                        $("#email2").hide();
-                    } else {
-                        $("#email_option").val("user_input").prop("selected", true);
-                        $("#email2").val(emailUserBack).show();
-                    }
-
-                    // 이메일 옵션 변경 이벤트 처리
-                    $('#email_option').change(function() {
-                        if ($(this).val() == "user_input") {
-                            $("#email2").show();
-                        } else {
-                            $("#email2").hide();
-                        }
-                    });
-
-                }).fail(function(error) {
-                    alert("실패하였습니다.");
-                    alert(JSON.stringify(error));
-                });
-            }
-        }
-
-        function getFileName(originalName) {
-            // 파일 경로를 분리하여 배열로 만든 후, 마지막 요소를 반환하여 파일 이름만 추출
-            return originalName.split('\\').pop().split('/').pop();
-        }
-        // 직원 수정 모달 - 수정 버튼
-        function modifyMember(){
-            var employId = Number($("#employId").val());
-            var employName = $("#employName").val();
-            var employRank = $("#employRank").val();
-            var phone = $("#phone").val();
-            var email = assembleEmail();
-            var saveName = $("#saveName").val();
-            var originalName = $("#originalName").val();
-            originalName = getFileName(originalName);
-            var fileInput = $("#originalName");
-            var file = fileInput.files;
-            var reader = new FileReader();
-
-            //사용 불가 혹은 인증을 하지 않은 경우에...
-            if($("#checkResult").text() == '사용불가' ||$("#checkResult").text() == ''){
-                alert("직원 번호를 확인해주세요");
-                return;
-            }
-
-            if (!validateEmail(email)) {
-                alert("이메일을 올바르게 입력해주세요.");
-                return;
-            }
-
-            if (!validateName(employName)) {
-                alert("이름을 올바르게 입력해주세요.");
-                return;
-            }
-
-            if (!validatePhone(phone)) {
-                alert("휴대폰번호를 올바르게 입력해주세요.");
-                return;
-            }
-
-
-            reader.onload = function(e) {
-                var arrayBuffer = e.target.result;
-                var bytes = new Uint8Array(arrayBuffer);
-                var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
-                var encodedFile = btoa(binaryString); // Base64 인코딩
-
-                var data = {
-                    "employeeVo": {
-                        "employId": employId,
-                        "employName": employName,
-                        "employRank": employRank,
-                        "phone": phone,
-                        "email": email
-                    },
-                    "fileVo": {
-                        "saveName": saveName,
-                        "originalName": originalName,
-                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
-                    }
-                };
-                $.ajax({
-                    anyne:true,
-                    type:'POST',
-                    data:JSON.stringify(data),
-                    url: "${contextPath}/modifyEmploy/"+employId,
-                    dataType : "text",
-                    contentType : 'application/json; charset=utf-8',
-                }).done(function(){
-                    console.log("성공");
-                    location.href='${contextPath}/';
-
-
-                }).fail(function(error){
-                    alert("실패하였습니다.")
-                    alert(JSON.stringify(error));
-                })
-
-            };
-
-            reader.readAsArrayBuffer(file);
-
-        }
-
-        //직원 수정 모달 - 파일 삭제
-        function deleteFile(id) {
-            $.ajax({
-                url: "${contextPath}/fileDelete/" + id,
-                type: 'POST',
-                async: false,
-                success: function(data) {
-                    console.log(data);
-                    let fileHtmlId = ".file_item_" + id;
-                    $(fileHtmlId).hide();
-                    alert("파일이 삭제되었습니다.");
-                },
-                error: function(e) {
-                    alert("파일 삭제에 실패하였습니다.");
-                    console.error(e);
-                }
-            });
-        }
-
-
-        //검색
-        function submitForm(){
-            $.ajax({
-                url: "${contextPath}/",
-                type: 'get',
-                data: $('#searchForm').serialize(),
-                async: false,
-                success: function (data){
-                    console.log(data)
-                    $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
-                    $('#listInfo').html(data);
-                },
-                error: function (e){
-                    alert(e);
-                }
-            })
-        }
-
-        // 직원 등록 모달창 파일 추가 버튼 클릭
-        function plus() {
-            var fileUploadForm = '<form class="file_upload_form">' +
-                '<label> 업로드할 파일 : </label>' +
-                '<input class="originalName" type="file" placeholder="저장할 파일명을 올려주세요" required>' +
-                '<button type="button" class="remove" onclick="removeForm(this)">X</button>' +
-                '</form>';
-            $(".file_upload").append(fileUploadForm);
-        }
-        // 동적으로 추가된 폼 요소를 제거하는 함수
-        function removeForm(element) {
-            $(element).closest('.file_upload_form').remove();
-        }
-
-        //메일 발송하기
-        function mailSubmit(employId){
-
-            data = {"employId" : Number(employId)};
-            console.log(employId+"메일 발송 test");
-            console.log(typeof employId+"메일 발송 test");
-            debugger
-            $.ajax({
-                url: "${contextPath}/email",
-                type: 'POST',
-                data:{ employId : Number(employId) },
-                async: false,
-                success: function (data){
-                    console.log(data)
-                    alert("메일을 발송했습니다. 메일을 확인해주세요.");
-                },
-                error: function (e){
-                    alert(e);
-                }
-            })
-        }
-
-
-
-
-    </script>
 </head>
 
 <body>
@@ -719,9 +190,558 @@
 
     </div>
 </div>
+<script type="text/javascript">
+    //직원 번호 중복 체크
+    function idCheck(event){
+        event.preventDefault(); // 폼의 기본 제출 이벤트 막기
+        let employIdForm = $("#employId").val();
+        if(employIdForm != employId){
 
-<script>
+        }
+        $.ajax({
+            type: 'GET',
+            url: '${contextPath}/idCheck',
+            data: { id: employIdForm },
+            dataType: 'text',
+            contentType: 'application/json; charset=utf-8',
+        }).done(function(response) {
+            console.log(response + ' 리턴 체크');
+            if (response === 'Vaild') {
+
+                alert('사용 가능한 직원번호입니다.');
+                $("#checkResult").text('사용가능');
+            } else {
+                if(employIdForm == employId){
+                    alert('사용 가능한 직원번호입니다.');
+                    $("#checkResult").text('사용가능');
+                }else {
+                    alert('이미 사용 중인 직원번호입니다.');
+                    $("#checkResult").text('사용불가');
+                }
+
+            }
+        }).fail(function(error) {
+            alert('오류가 발생하였습니다.');
+            console.error(JSON.stringify(error));
+        });
+
+        // 기본 이벤트 동작 막기
+        return false;
+    }
+
+    function validateEmail(email) {
+        var regEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        return regEmail.test(email);
+    }
+
+    function validateName(name) {
+        var regName = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+        return regName.test(name);
+    }
+
+    function validatePhone(phone) {
+        var regName = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+        return regName.test(phone);
+    }
+
+    //직원 등록
+    function addMember() {
+        var employId = Number($("#employId").val());
+        var employName = $("#employName").val();
+        var employRank = $("#employRank").val();
+        var phone = $("#phone").val();
+        var email = assembleEmail();
+        var saveName = $("#saveName").val();
+
+        // 유효성 검사
+        var regExpName = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+        var regPhone = /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$/;
+
+        if ($("#checkResult").text() == '사용불가' || $("#checkResult").text() == '') {
+            alert("직원 번호를 확인해주세요");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            alert("이메일을 올바르게 입력해주세요.");
+            return;
+        }
+
+        if (!regExpName.test(employName)) {
+            alert("이름을 올바르게 입력해주세요");
+            return;
+        }
+
+        if (!regPhone.test(phone)) {
+            alert("휴대폰 번호를 올바르게 입력해주세요");
+            return;
+        }
+
+        var formData = {
+            "employeeVo": {
+                "employId": employId,
+                "employName": employName,
+                "employRank": employRank,
+                "phone": phone,
+                "email": email
+            },
+            "fileVo": []
+        };
+
+        // 파일 데이터 추가
+        var filesProcessed = 0;
+        var totalFiles = $(".file_upload_form input[type='file']").length;
+
+        $(".file_upload_form input[type='file']").each(function(index, fileInput) {
+            var file = fileInput.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var arrayBuffer = e.target.result;
+                    var bytes = new Uint8Array(arrayBuffer);
+                    var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+                    var encodedFile = btoa(binaryString); // Base64 인코딩
+
+                    formData.fileVo.push({
+                        "saveName": saveName,
+                        "originalName": file.name,
+                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
+                    });
+
+                    filesProcessed++;
+                    if (filesProcessed === totalFiles) {
+                        // 모든 파일이 처리되면 AJAX 요청을 보냅니다.
+                        $.ajax({
+                            type: 'POST',
+                            data: JSON.stringify(formData),
+                            url: "${contextPath}/addEmployee",
+                            dataType: "text",
+                            contentType: 'application/json; charset=utf-8',
+                        }).done(function() {
+                            console.log("성공");
+                            window.location.href = "${contextPath}/employeeDetail/" + employId;
+                        }).fail(function(error) {
+                            alert("실패하였습니다.");
+                            alert(JSON.stringify(error));
+                        });
+                    }
+                };
+                reader.readAsArrayBuffer(file); // 파일을 읽고 Base64 인코딩
+            } else {
+                filesProcessed++;
+            }
+        });
+
+        // 파일이 없을 경우에도 폼 데이터를 전송합니다.
+        if (totalFiles === 0) {
+            $.ajax({
+                type: 'POST',
+                data: JSON.stringify(formData),
+                url: "${contextPath}/addEmployee",
+                dataType: "text",
+                contentType: 'application/json; charset=utf-8',
+            }).done(function() {
+                console.log("성공");
+                window.location.href = "${contextPath}/employeeDetail/" + employId;
+            }).fail(function(error) {
+                alert("실패하였습니다.");
+                alert(JSON.stringify(error));
+            });
+        }
+    }
+
+
+    //직원 번호 입력 창 값이 변경 될 때마다 초기화 작업
+    function employeeIdChange(){
+        $("#checkResult").text('');
+    }
+
+    function assembleEmail() {
+        var emailUser = $("#email").val();
+        var domain = $("#email_option").val();
+        if (domain === "user_input") {
+            domain = $("#email2").val();
+        }
+        return emailUser + domain;
+    }
+
+
     $(document).ready(function() {
+        $("#email_option").change(function() {
+            if ($(this).val() == "user_input") {
+                $("#email2").show();
+            } else {
+                $("#email2").hide();
+            }
+        });
+    });
+
+
+    let employId = '';
+
+    //여러개의 체크박스 값들의 상태값을 가져오는 방법
+    var chk_arr = [];
+    $("input[name=option]:checked").each(function (){
+        var chk = $(this).val();
+        chk_arr.push(chk);
+    })
+
+    // 수정 --------
+    var check_set = new Set();
+    function getCheckValue(event){
+
+        $("input[name=option]:checked").each(function (){
+            var chk = $(this).val();
+            check_set.add(chk);
+        })
+
+        if(!event.target.checked) {
+            check_set.delete(event.target.value);
+        }
+
+        employId = event.target.value;
+        console.log("현재 선택한 체크박스는 : "+employId);
+        console.log(check_set+": 집합 /// 체크리스트 배열 확인용, set의 길이:"+check_set.size);
+    }
+
+    function checkBox(currentCheckBox){
+        const checkBoxs = document.getElementsByName("option");
+
+        console.log(checkBoxs.length+'체크박스 길이 테스트');
+        let checkedCount = 0;
+        employId = currentCheckBox.value
+        for(let i =0; i<checkBoxs.length; i++){
+            if(checkBoxs[i].checked){
+                checkedCount++;
+                if(checkBoxs[i] !== currentCheckBox){
+                    checkBoxs[i].checked =
+                        false;
+                    employId = currentCheckBox.value
+                    console.log("체크박스 이벤트테스트", employId)
+                }
+            }
+        }
+
+        if (checkedCount === 0) {
+            currentCheckbox.checked = true;
+
+        }
+
+        console.log("체크박스 이벤트테스트", employId)
+    }
+
+
+    function deleteemploy() {
+        var checkedIds = Array.from(check_set);
+
+        if (checkedIds.length === 0) {
+            alert("삭제할 직원을 최소 한 명 이상 선택해주세요.");
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "${contextPath}/deleteEmploy",
+            data: JSON.stringify(checkedIds),
+            contentType: 'application/json; charset=utf-8',
+        }).done(function() {
+            alert("성공적으로 삭제되었습니다.");
+            location.reload();
+        }).fail(function(error) {
+            alert("실패하였습니다.");
+            console.log(checkedIds + "체크 아이디 확인용")
+            console.error(JSON.stringify(error));
+        });
+    }
+
+    // 파일 이름을 추출하는 함수
+    function getFileName(originalName) {
+        if (!originalName) {
+            return "";
+        }
+        return originalName.split('\\').pop().split('/').pop();
+    }
+
+    // 직원 수정 모달 - 수정 버튼
+    function modifyMember(){
+        var employId = Number($("#employId").val());
+        var employName = $("#employName").val();
+        var employRank = $("#employRank").val();
+        var phone = $("#phone").val();
+        var email = assembleEmail();
+        var saveName = $("#saveName").val();
+
+        // 유효성 검사
+        if ($("#checkResult").text() == '사용불가' || $("#checkResult").text() == '') {
+            alert("직원 번호를 확인해주세요");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            alert("이메일을 올바르게 입력해주세요.");
+            return;
+        }
+
+        if (!validateName(employName)) {
+            alert("이름을 올바르게 입력해주세요.");
+            return;
+        }
+
+        if (!validatePhone(phone)) {
+            alert("휴대폰번호를 올바르게 입력해주세요.");
+            return;
+        }
+
+        var formData = {
+            "employeeVo": {
+                "employId": employId,
+                "employName": employName,
+                "employRank": employRank,
+                "phone": phone,
+                "email": email
+            },
+            "fileVo": []
+        };
+
+        // 파일 데이터 추가
+        var filesProcessed = 0;
+        var totalFiles = $(".file_upload_form input[type='file']").length;
+
+        $(".file_upload_form input[type='file']").each(function(index, fileInput) {
+            var file = fileInput.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var arrayBuffer = e.target.result;
+                    var bytes = new Uint8Array(arrayBuffer);
+                    var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+                    var encodedFile = btoa(binaryString); // Base64 인코딩
+
+                    formData.fileVo.push({
+                        "saveName": saveName,
+                        "originalName": file.name,
+                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
+                    });
+
+                    filesProcessed++;
+                    if (filesProcessed === totalFiles) {
+                        // 모든 파일이 처리되면 AJAX 요청을 보냅니다.
+                        sendModifyRequest(formData);
+                    }
+                };
+                reader.readAsArrayBuffer(file); // 파일을 읽고 Base64 인코딩
+            } else {
+                filesProcessed++;
+            }
+        });
+
+        // 파일이 없을 경우에도 폼 데이터를 전송합니다.
+        if (totalFiles === 0) {
+            sendModifyRequest(formData);
+        }
+    }
+
+    // AJAX 요청을 보내는 함수
+    function sendModifyRequest(formData) {
+        $.ajax({
+            type: 'POST',
+            data: JSON.stringify(formData),
+            url: "${contextPath}/modifyEmploy/" + formData.employeeVo.employId,
+            dataType: "text",
+            contentType: 'application/json; charset=utf-8',
+        }).done(function() {
+            console.log("성공");
+            location.href='${contextPath}/';
+        }).fail(function(error) {
+            alert("실패하였습니다.");
+            alert(JSON.stringify(error));
+        });
+    }
+    //직원 수정 모달 - 파일 삭제
+    function deleteFile(id) {
+        $.ajax({
+            url: "${contextPath}/fileDelete/" + id,
+            type: 'POST',
+            async: false,
+            success: function(data) {
+                console.log(data);
+                let fileHtmlId = ".file_item_" + id;
+                $(fileHtmlId).hide();
+                alert("파일이 삭제되었습니다.");
+            },
+            error: function(e) {
+                alert("파일 삭제에 실패하였습니다.");
+                console.error(e);
+            }
+        });
+    }
+
+
+    //검색
+    function submitForm(){
+        $.ajax({
+            url: "${contextPath}/",
+            type: 'get',
+            data: $('#searchForm').serialize(),
+            async: false,
+            success: function (data){
+                console.log(data)
+                $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
+                $('#listInfo').html(data);
+            },
+            error: function (e){
+                alert(e);
+            }
+        })
+    }
+
+    // 직원 등록 모달창 파일 추가 버튼 클릭
+    function plus() {
+        var fileUploadForm = '<form class="file_upload_form">' +
+            '<label> 업로드할 파일 : </label>' +
+            '<input class="originalName" type="file" placeholder="저장할 파일명을 올려주세요" required>' +
+            '<button type="button" class="remove" onclick="removeForm(this)">X</button>' +
+            '</form>';
+        $(".file_upload").append(fileUploadForm);
+    }
+    // 동적으로 추가된 폼 요소를 제거하는 함수
+    function removeForm(element) {
+        $(element).closest('.file_upload_form').remove();
+    }
+
+    //메일 발송하기
+    function mailSubmit(employId){
+
+        data = {"employId" : Number(employId)};
+        console.log(employId+"메일 발송 test");
+        console.log(typeof employId+"메일 발송 test");
+        debugger
+        $.ajax({
+            url: "${contextPath}/email",
+            type: 'POST',
+            data:{ employId : Number(employId) },
+            async: false,
+            success: function (data){
+                console.log(data)
+                alert("메일을 발송했습니다. 메일을 확인해주세요.");
+            },
+            error: function (e){
+                alert(e);
+            }
+        })
+    }
+
+
+
+
+</script>
+<script>
+
+    // 수정 버튼 클릭 이벤트 연결
+    $('.modify_btn').click(function() {
+        var employId = $(this).data('employId'); // 버튼에 데이터 속성으로 저장된 직원 ID를 가져옵니다.
+        modifyEmployInfo(employId); // 직원 정보 수정 함수 호출
+    });
+
+    //직원 수정
+    function modifyEmployInfo(){
+        console.log(employId + "직원 아이디 테스트 입니다.");
+
+        var checkedIds = Array.from(check_set);
+
+        if (checkedIds.length === 0) {
+            alert("수정할 직원을 한명만 선택해주세요.");
+            return;
+        } else if (checkedIds.length > 1) {
+            alert("수정할 직원을 한명만 선택해주세요.");
+            return;
+        } else {
+            $(".title").text("직원 수정");
+            $("#add_modal").show();
+            $('#modifyMember').show();
+            $('#addMember').hide();
+            $(".saved_file").show();
+
+            // 수정할 직원 정보를 가져오기.
+            $.ajax({
+                anyne: true,
+                type: 'GET',
+                data: JSON.stringify(employId),
+                url: "${contextPath}/modifyEmploy/" + employId,
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+            }).done(function(data) {
+                console.log(data.employee.employName + "데이터 확인용==============");
+                console.log(data + "데이터 확인용==============");
+                console.log(data.file + "데이터 확인용==============");
+
+                // 모달창의 input 필드에 값 설정
+                $("#employId").val(data.employee.employId);
+                $("#employName").val(data.employee.employName);
+                $("#employRank").val(data.employee.employRank);
+                $("#phone").val(data.employee.phone);
+
+                // 기존 파일 리스트 초기화
+                $(".saved_file .file_list").empty();
+
+                // 파일 데이터가 존재하는 경우에
+                if (data.file && data.file.length > 0) {
+                    console.log(data.file +'test==')
+                    data.file.forEach(function(file) {
+                        console.log(file)
+
+                        var fileHtml = `
+                        <div class="file_item_`+file.id+`">
+                            <p>파일 아이디: <span>`+file.id+`</span></p>
+                            <p>파일 원본이름: <span>`+file.originalName+`</span></p>
+                            <p>파일 등록일: <span>`+file.createAt+`</span></p>
+                            <button class="deleteFile" onclick="deleteFile(`+file.id+`)">-파일삭제-</button>
+                        </div>`;
+                        $(".saved_file .file_list").append(fileHtml);
+                    });
+
+                    // 파일 데이터가 있는 경우에 UI
+                    $(".file_list").show();
+                } else {
+                    // 파일 데이터가 없는 경우에 UI
+                    $(".file_list").hide();
+                    $(".saved_file > h3").text("저장된 파일 데이터가 없습니다.");
+                }
+
+                // 이메일 주소에서 '@' 이전의 부분만 추출하여 입력 필드에 설정 - 앞부분
+                var emailUserFront = data.employee.email.split('@')[0];
+                $("#email").val(emailUserFront);
+
+                // 이메일 뒷 부분
+                var emailUserBack = data.employee.email.split('@')[1];
+                console.log(emailUserBack + "이메일 뒷부분?");
+                // 이메일 뒷부분 자동 세팅
+                const emailList = ["naver.com", "gmail.com", "nate.com"];
+                if (emailList.includes(emailUserBack)) {
+                    $("#email_option").val('@' + emailUserBack).prop("selected", true);
+                    $("#email2").hide();
+                } else {
+                    $("#email_option").val("user_input").prop("selected", true);
+                    $("#email2").val(emailUserBack).show();
+                }
+
+                // 이메일 옵션 변경 이벤트 처리
+                $('#email_option').change(function() {
+                    if ($(this).val() == "user_input") {
+                        $("#email2").show();
+                    } else {
+                        $("#email2").hide();
+                    }
+                });
+
+            }).fail(function(error) {
+                alert("실패하였습니다.");
+                alert(JSON.stringify(error));
+            });
+        }
+    }
+    $(document).ready(function() {
+
         // 페이지 로드 시 URL 파라미터를 읽어와서 폼 필드에 설정
         function setFormFieldsFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
