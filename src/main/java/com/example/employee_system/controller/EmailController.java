@@ -23,7 +23,7 @@ public class EmailController {
     private final EmployeeService employeeService;
     private final FileService fileService;
 
-    public static final String RECEIVED_EMAIL = "coko131@naver.com";
+    public static final String RECEIVED_EMAIL = "hjkim2@comtrue.com";
 
     // 직원 정보 이메일 발송
     @PostMapping("/email")
