@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class EmailController {
     private final EmployeeService employeeService;
     private final FileService fileService;
 
-    private final String RECEIVED_EMAIL = "coko131@naver.com";
+    public static final String RECEIVED_EMAIL = "coko131@naver.com";
 
     // 직원 정보 이메일 발송
     @PostMapping("/email")
@@ -62,7 +63,11 @@ public class EmailController {
         emailDto.setText(emailContent); // 메일 내용
         emailDto.setEmployeeId(employId); // 직원 번호
 
-        emailService.sendEmployeeInfo(emailDto);
+        try {
+            emailService.sendEmployeeInfo(emailDto, fileList);     // 메일 내용 보내기 (첨부파일 포함)
+        } catch (MessagingException e) {
+            return "메일 발송에 실패했습니다.";
+        }
         emailService.saveMailHistory(employId, RECEIVED_EMAIL);
 
         int emailCount = emailService.countMailHistoryByEmployeeId(employId);
