@@ -6,9 +6,7 @@ import com.example.employee_system.bean.dto.JoinRequestDto;
 import com.example.employee_system.bean.dto.RequestDto;
 import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.service.EmployeeService;
-//import jakarta.servlet.http.HttpServletRequest;
 import com.example.employee_system.service.FileService;
-import com.example.employee_system.vo.EmployeeVo;
 import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
 import org.springframework.http.HttpStatus;
@@ -188,13 +186,6 @@ public class EmployeeController {
                 fileService.fileSave(file, fileBytes);
             }
 
-            //직원 pk키 조회
-            /*EmployeeDto employeeDto = employeeService.getEmployById(joinRequestDto.getEmployeeVo().getEmployId());
-            Long id = employeeDto.getId();
-            joinRequestDto.getFileVo().setEmployId(id);*/
-
-            // 파일 수정 메서드 호출
-            //fileService.fileSave(joinRequestDto.getFileVo(), fileBytes);
 
             return ResponseEntity.ok("success");
         } catch (Exception e) {

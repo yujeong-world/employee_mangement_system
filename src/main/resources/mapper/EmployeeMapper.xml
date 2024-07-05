@@ -31,9 +31,6 @@
         <selectKey keyProperty="id" resultType="long" order="AFTER" keyColumn="id">
             select id from employee where EMPLOY_ID = #{employId}
         </selectKey>
-       <!-- <selectKey keyColumn="id" keyProperty="" resultType="long">
-            select id from employee where EMPLOY_ID = #{employId}
-        </selectKey>-->
     </insert>
 
     <!--직원 수정-->
@@ -90,6 +87,12 @@
     <!-- 검색된 직원 수 조회 -->
     <select id="searchEmployeeCount" resultType="int">
         select count(*) from employee
+        <include refid="searchConditions"/>
+    </select>
+
+    <!--엑셀 직원 조회(카테고리, 검색어) -->
+    <select id="selectEmployeeListByCategoryAndSearch" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        SELECT * FROM EMPLOYEE
         <include refid="searchConditions"/>
     </select>
 

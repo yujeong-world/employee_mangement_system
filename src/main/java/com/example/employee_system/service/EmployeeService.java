@@ -21,9 +21,6 @@ public class EmployeeService {
         return employeeMapper.selectEmployeeList();
     }
 
-    //직원 pk 조회
-
-
     //직원 등록
     @Transactional
     public void addEmployee(EmployeeVo employee){
@@ -63,6 +60,11 @@ public class EmployeeService {
     //직원 조회 pk로
     public EmployeeDto getEmployById(int id){
         return employeeMapper.selectEmployeeById(id);
+    }
+
+    //엑셀 직원 조회(카테고리, 검색어)
+    public List<EmployeeDto> getEmployListByCategoryAndSearch(String category, String keyword){
+        return employeeMapper.selectEmployeeListByCategoryAndSearch(category, keyword);
     }
 
 

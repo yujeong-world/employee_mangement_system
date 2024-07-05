@@ -44,7 +44,7 @@ public class FileService {
 
     //파일명 랜덤 생성 메서드
     private String setFileSaveName() {
-        //uuid 생성(Univerdal Unique IDentifier, 범용 고유 식별자)
+        //uuid 생성(범용 고유 식별자)
         UUID uuid = UUID.randomUUID();
 
         //랜덤 생성 파일이름 저장
@@ -68,7 +68,6 @@ public class FileService {
             }
             filePath = datePath.toString();
             fileVo.setSavePath(filePath);
-            //updateFilePath(id, filePath);
         }
         //해당 로컬 경로에 파일 복사
 
@@ -77,10 +76,8 @@ public class FileService {
         fileVo.setSaveName(saveName);
 
         // 파일 저장
-       // String orginalName = fileVo.getOriginalName();
         Path targetLocation = Paths.get(filePath).resolve(saveName);
         Files.write(targetLocation, fileBytes); // 바이트 배열을 파일로 저장
-        //fileVo.setSaveName(saveName);
 
         fileMapper.saveFile(fileVo);
     }
@@ -130,21 +127,12 @@ public class FileService {
             Files.createDirectories(directoryPath);
         }
 
-       /* // 파일 저장
-        String saveName = fileVo.getSaveName();
-        Path targetLocation = directoryPath.resolve(saveName);
-        Files.write(targetLocation, fileBytes); // 바이트 배열을 파일로 저장
-        fileVo.setSaveName(saveName);*/
-
-        //파일 saveName 랜덤 파일명 생성하기
         String saveName = setFileSaveName();
         fileVo.setSaveName(saveName);
 
         // 파일 저장
-        // String orginalName = fileVo.getOriginalName();
         Path targetLocation = Paths.get(filePath).resolve(saveName);
         Files.write(targetLocation, fileBytes); // 바이트 배열을 파일로 저장
-        //fileVo.setSaveName(saveName);
 
         // 파일 정보 업데이트
         fileMapper.updateFile(fileVo);

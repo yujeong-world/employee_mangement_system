@@ -54,6 +54,7 @@
             <button id="add_btn" class="btn btn-outline-primary" >등록</button>
             <button id="modify_btn" onclick="modifyEmployInfo()" class="btn btn-outline-secondary">수정</button>
             <button onclick="deleteemploy()" class="btn btn-outline-dark">삭제</button>
+            <button onclick="excelDownload()" class="btn btn-primary btn-sm">엑셀다운</button>
         </div>
 
         <div class="form_area">
@@ -100,6 +101,7 @@
                     <th>선택</th>
                     <th>직원번호</th>
                     <th>직원이름</th>
+                    <th>부서</th>
                     <th>직급</th>
                     <th>전화번호</th>
                     <th>이메일</th>
@@ -122,6 +124,8 @@
                         <td>
                             <a onclick="detail(${list.employId})">${list.employName}</a>
                         </td>
+
+                        <td>${list.department}</td>
 
                         <td>${list.employRank}</td>
                         <td>${list.phone}</td>
@@ -167,6 +171,10 @@
                         <div>
                             <label>직원명</label>
                             <input type="text" id="employName" placeholder="직원이름을 입력하세요">
+                        </div>
+                        <div>
+                            <label>부서</label>
+                            <input type="text" id="department" placeholder="부서명을 입력하세요">
                         </div>
                         <div>
                             <label>직급</label>
@@ -227,6 +235,19 @@
     </div>
 </div>
 <script type="text/javascript">
+    // 엑셀 다운로드 버튼
+    function excelDownload() {
+        //url 파라미터 가지고 오기
+        let urlSearch = new URLSearchParams(location.search);
+        let category = urlSearch.get('category')
+        let keyword = urlSearch.get('keyword')
+        //var category = encodeURIComponent("yourCategory"); // 필요에 따라 카테고리 값을 설정하세요
+        //var keyword = encodeURIComponent("yourKeyword"); // 필요에 따라 키워드 값을 설정하세요
+        var url = "${contextPath}/excel/download?category=" + category + "&keyword=" + keyword;
+        //var url = "${contextPath}/excel/download";
+        window.location.href = url;
+    }
+
     //직원 번호 중복 체크
     function idCheck(event){
         event.preventDefault(); // 폼의 기본 제출 이벤트 막기
@@ -288,6 +309,7 @@
         var phone = $("#phone").val();
         var email = assembleEmail();
         var saveName = $("#saveName").val();
+        var department = $("#department").val();
 
         // 유효성 검사
         var regExpName = /^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
@@ -317,6 +339,7 @@
             "employeeVo": {
                 "employId": employId,
                 "employName": employName,
+                "department": department,
                 "employRank": employRank,
                 "phone": phone,
                 "email": email
@@ -714,6 +737,7 @@
                 // 모달창의 input 필드에 값 설정
                 $("#employId").val(data.employee.employId);
                 $("#employName").val(data.employee.employName);
+                $("#department").val(data.employee.department);
                 $("#employRank").val(data.employee.employRank);
                 $("#phone").val(data.employee.phone);
 

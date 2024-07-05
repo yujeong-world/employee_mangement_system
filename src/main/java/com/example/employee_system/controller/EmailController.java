@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class EmailController {
     // 직원 정보 이메일 발송
     @PostMapping("/email")
     @ResponseBody
-    public String sendEmail(@RequestParam int employId) {
+    public String sendEmail(@RequestParam int employId) throws IOException {
         EmployeeDto employeeDto = employeeService.getEmployById(employId);
 
         Long employeeId = employeeDto.getId();
@@ -64,7 +65,7 @@ public class EmailController {
         emailDto.setEmployeeId(employId); // 직원 번호
 
         try {
-            emailService.sendEmployeeInfo(emailDto, fileList);     // 메일 내용 보내기 (첨부파일 포함)
+            emailService.sendEmployeeInfo(emailDto/*, fileList*/);     // 메일 내용 보내기 (첨부파일 포함)
         } catch (MessagingException e) {
             return "메일 발송에 실패했습니다.";
         }

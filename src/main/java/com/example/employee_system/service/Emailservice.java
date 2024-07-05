@@ -1,68 +1,89 @@
 package com.example.employee_system.service;
-
 import com.example.employee_system.bean.dto.EmailDto;
-import com.example.employee_system.bean.dto.EmployeeDto;
-import com.example.employee_system.bean.dto.FileDto;
 import com.example.employee_system.mapper.EmailMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.javamail.JavaMailSender;
-import javax.mail.MessagingException;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.util.List;
+import java.io.IOException;
+import java.util.Properties;
+
 
 @Service
 @RequiredArgsConstructor
 public class Emailservice {
     private final EmailMapper emailMapper;
-    private final JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    //private static final String FIXED_FILE_PATH = "C:/Users/USER/Desktop/uploading/";  // 내 로컬에서 파일이 저장된 고정 경로 (자기 환경에 맞게 수정)
+    @Value("${spring.mail.password}")
+    private String emailPassword;
+
+    private final String host = "smtp.gmail.com";
+    private final int port = 587;
+
 
     // 1. 메일 발송 내역
-    public void sendEmployeeInfo(EmailDto emailDto, List<FileDto> files) throws MessagingException {
-       /* SimpleMailMessage message = new SimpleMailMessage();
+    public void sendEmployeeInfo(EmailDto emailDto/*, List<FileDto> files*/) throws MessagingException, IOException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", host);
 
-        message.setTo(fromEmail); // 보내는 사람
-        message.setTo(emailDto.getToEmail());      // 받는 사람
-        message.setSubject(emailDto.getSubject()); // 제목
-        message.setText(emailDto.getText());       // 내용
-        mailSender.send(message);                  // 보내기*/
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8"); // 첨부파일 기능
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, emailPassword);
+            }
+        });
 
-        helper.setFrom(fromEmail);                // 보내는 사람
-        helper.setTo(emailDto.getToEmail());      // 받는 사람
-        helper.setSubject(emailDto.getSubject()); // 제목
-        helper.setText(emailDto.getText(), true); // 내용 (HTML 가능)
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress("coko131@naver.com"));
+        message.setSubject(emailDto.getSubject());
+        message.setText(emailDto.getText());
 
         // 첨부파일 추가
-        if (files != null) {
+       /* if (files != null) {
             for (FileDto fileDto : files) {
-                File file = new File(fileDto.getSavePath()+ "/" + fileDto.getSaveName()); // 고정 경로와 저장된 파일명을 결합하여 File 객체 생성
-                helper.addAttachment(fileDto.getOriginalName(), file); // 첨부파일 추가
+                MimeBodyPart attachmentPart = new MimeBodyPart();
+                attachmentPart.attachFile(new File(fileDto.getSavePath() + "/" + fileDto.getSaveName()));
+                Multipart multipart = new MimeMultipart();
+                multipart.addBodyPart(attachmentPart);
+                message.setContent(multipart);
             }
-        }
-        mailSender.send(message);
+        }*/
+
+        Transport.send(message);
+
     }
 
-    //메일 보내기
-    public void sendEmail(EmailDto emailDto) throws MessagingException {
-        SimpleMailMessage message = new SimpleMailMessage();
+    // 메일 보내기
+    public void sendEmail(EmailDto emailDto/*, List<FileDto> files*/) throws MessagingException {
+        Properties props = new Properties();
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", host);
 
-        message.setTo(fromEmail); // 보내는 사람
-        message.setTo(emailDto.getToEmail());      // 받는 사람
-        message.setSubject(emailDto.getSubject()); // 제목
-        message.setText(emailDto.getText());       // 내용
-        mailSender.send(message);                  // 보내기
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(fromEmail, emailPassword);
+            }
+        });
 
+        Message message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(fromEmail));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress("coko131@naver.com"));
+        message.setSubject(emailDto.getSubject());
+        message.setText(emailDto.getText());
+
+        Transport.send(message);
     }
 
     // 2. 메일 발송 기록 저장(DB)

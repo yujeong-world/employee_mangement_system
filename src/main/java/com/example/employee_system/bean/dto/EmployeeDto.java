@@ -16,6 +16,7 @@ public class EmployeeDto {
     private Long id;
     private int employId;
     private String employName;
+    private String department;
     private String employRank;
     private String phone;
     private String email;
