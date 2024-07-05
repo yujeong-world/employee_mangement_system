@@ -19,6 +19,7 @@ public class SchedulerService {
 
     /*@Scheduled(fixedDelay = 10000) */// 10초 마다 실행
     // 매일 오후 14시에 실행
+    //@Scheduled(cron = "0 0 14 * * *")
     @Scheduled(cron = "0 0 14 * * *")
     public void serverInfoEmail() throws MessagingException {
         //메일 내용

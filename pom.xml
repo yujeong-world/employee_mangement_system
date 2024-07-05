@@ -68,11 +68,11 @@
 
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
         <!-- spring-boot-starter-mail 의존성 추가 -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
-            <version>2.6.2</version> <!-- 사용 중인 Spring Boot 버전과 맞춰주세요 -->
-        </dependency>
+            <version>2.6.2</version> &lt;!&ndash; 사용 중인 Spring Boot 버전과 맞춰주세요 &ndash;&gt;
+        </dependency>-->
 
         <!-- 이메일 인증 -->
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
@@ -92,6 +92,25 @@
             <version>1.6.2</version>
             <optional>false</optional>
             <scope>compile</scope>
+        </dependency>
+
+        <!-- apache poi(for excel) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-examples -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-examples</artifactId>
+            <version>5.0.0</version>
         </dependency>
 
 

@@ -31,9 +31,6 @@
         <selectKey keyProperty="id" resultType="long" order="AFTER" keyColumn="id">
             select id from employee where EMPLOY_ID = #{employId}
         </selectKey>
-       <!-- <selectKey keyColumn="id" keyProperty="" resultType="long">
-            select id from employee where EMPLOY_ID = #{employId}
-        </selectKey>-->
     </insert>
 
     <!--직원 수정-->
@@ -50,32 +47,31 @@
         where EMPLOY_ID=#{employId}
     </delete>
 
-    <!--총 개시물 개수 반환-->
-    <select id="totalCount" resultType="int">
-        select count(*) from employee
-    </select>
 
-    <select id="findEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+<!--    <select id="findEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
         select * from employee limit #{limit} offset #{offset}
-    </select>
+    </select>-->
 
     <!--검색 기능-->
     <sql id="searchConditions">
         <where>
-            <if test="category == 'name'">
-                AND employ_name LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="category == 'id'">
-                AND employ_id LIKE CAST(#{keyword} AS INTEGER)
-            </if>
-            <if test="category == 'rank'">
-                AND employ_rank LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="category == 'phone'">
-                AND phone LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="category == 'email'">
-                AND email LIKE CONCAT('%', #{keyword}, '%')
+            <!--마이바티스에서 null & 빈값 체크로 하나의 sql 사용 가능 -->
+            <if test='category != null and category !="" and keyword != null and keyword !=""'>
+                <if test="category == 'name'">
+                    AND employ_name LIKE CONCAT('%', #{keyword}, '%')
+                </if>
+                <if test="category == 'id'">
+                    AND employ_id LIKE CAST(#{keyword} AS INTEGER)
+                </if>
+                <if test="category == 'rank'">
+                    AND employ_rank LIKE CONCAT('%', #{keyword}, '%')
+                </if>
+                <if test="category == 'phone'">
+                    AND phone LIKE CONCAT('%', #{keyword}, '%')
+                </if>
+                <if test="category == 'email'">
+                    AND email LIKE CONCAT('%', #{keyword}, '%')
+                </if>
             </if>
         </where>
     </sql>
@@ -87,9 +83,20 @@
         limit #{pageSize} offset #{pageIndex}
     </select>
 
+    <!--총 개시물 개수 반환-->
+<!--    <select id="totalCount" resultType="int">
+        select count(*) from employee
+    </select>-->
+
     <!-- 검색된 직원 수 조회 -->
     <select id="searchEmployeeCount" resultType="int">
         select count(*) from employee
+        <include refid="searchConditions"/>
+    </select>
+
+    <!--엑셀 직원 조회(카테고리, 검색어) -->
+    <select id="selectEmployeeListByCategoryAndSearch" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        SELECT * FROM EMPLOYEE
         <include refid="searchConditions"/>
     </select>
 

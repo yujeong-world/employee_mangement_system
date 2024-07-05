@@ -75,6 +75,9 @@
                 직원이름 <span>${employee.employName}</span>
             </li>
             <li>
+                부서 <span>${employee.department}</span>
+            </li>
+            <li>
                  직급 <span>${employee.employRank}</span>
             </li>
             <li>

@@ -30,7 +30,7 @@ public interface EmployeeMapper {
     EmployeeDto selectEmployeeById(int id);
 
     //전체 직원 수 조회
-    int totalCount();
+    //int totalCount();
 
     //페이징 조회
     List<EmployeeDto> findEmployee(int offset, int limit);
@@ -41,7 +41,8 @@ public interface EmployeeMapper {
     // 검색 필터링 데이터 총 개수
     int searchEmployeeCount(String category, String keyword);
 
-
+    //엑셀 다운로드 조회 데이터(카테고리, 키워드)
+    List<EmployeeDto> selectEmployeeListByCategoryAndSearch(String category, String keyword);
 
 
 }

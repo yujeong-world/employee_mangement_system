@@ -35,6 +35,7 @@ table {
     width: 100%;
     border-top: 1px solid #444444;
     border-collapse: collapse;
+    font-size: 15px;
 }
 th, td {
     border-bottom: 1px solid #444444;
@@ -68,13 +69,14 @@ th, td {
 }
 /*상단 버튼*/
 .table_top_container .btn_area{
-    width: 25%;
+    width: 40%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 .table_top_container .btn_area button{
-    width: 30%;
+    width: 20%;
+    padding: 5px;
+    margin: 3px;
 }
 .form_area #searchForm select{
     height: 30px;
