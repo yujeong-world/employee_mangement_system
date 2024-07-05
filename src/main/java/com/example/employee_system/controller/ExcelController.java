@@ -112,8 +112,8 @@ public class ExcelController {
 
     //엑셀 직원 정보 일괄 등록하기
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestParam("file") MultipartFile file, Model model) throws IOException{
-        System.out.println("filename :"+file.getOriginalFilename() );
+    public ResponseEntity<String> save(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        System.out.println("filename :" + file.getOriginalFilename());
 
         XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
         XSSFSheet sheet = workbook.getSheetAt(0);
@@ -125,7 +125,7 @@ public class ExcelController {
 
 
             DataFormatter formatter = new DataFormatter();
-            XSSFRow row = sheet.getRow(i+1);
+            XSSFRow row = sheet.getRow(i + 1);
 
             //직원 코드
             int employId = Integer.parseInt(formatter.formatCellValue(row.getCell(0)));
@@ -134,7 +134,7 @@ public class ExcelController {
             String checkMsg = employeeService.idCheck(employId);
             if (checkMsg != "Vaild") {
                 // 직원 코드가 유효하지 않으면
-                return ResponseEntity.ok("직원 코드가 유효하지 않습니다. 확인해주세요");
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 직원 코드가 유효하지 않습니다. 확인해주세요");
             }
             //직원 코드
             /*int employId = 0;
@@ -155,6 +155,24 @@ public class ExcelController {
             //이메일
             String email = formatter.formatCellValue(row.getCell(5));
 
+            //직원코드, 직원명, 직급, 전화번호, 메일주소의 입력 여부 확인
+            if(employName ==null || employName.equals("")) {
+                // 직원명을 입력하지 않을 경우
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 직원명을 입력해주세요");
+            }
+            if(department ==null || department.equals("")) {
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 부서를 입력해주세요");
+            }
+            if(rank ==null || rank.equals("")) {
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 직급을 입력해주세요");
+            }
+            if(phone ==null || phone.equals("")) {
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 휴대폰번호를 입력해주세요");
+            }
+            if(email ==null || email.equals("")) {
+                return ResponseEntity.ok(row.getRowNum()+"번째 행의 이메일을 입력해주세요");
+            }
+
             excel.setEmployId(employId);
             excel.setEmployName(employName);
             excel.setDepartment(department);
@@ -163,7 +181,10 @@ public class ExcelController {
             excel.setEmail(email);
 
             excelService.insertExcel(excel);
+
         }
+        return ResponseEntity.ok("일괄 등록에 성공하였습니다.");
+
 
     }
 }
