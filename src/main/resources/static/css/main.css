@@ -3,7 +3,7 @@
 }
 
 /* 모달 전체 배경 */
-#add_modal, #modify_modal {
+#add_modal, #modify_modal, #axcel_modal {
     position: fixed; /* 뷰포트에 고정 */
     top: 0;
     left: 0;

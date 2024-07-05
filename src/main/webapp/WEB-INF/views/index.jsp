@@ -55,6 +55,7 @@
             <button id="modify_btn" onclick="modifyEmployInfo()" class="btn btn-outline-secondary">수정</button>
             <button onclick="deleteemploy()" class="btn btn-outline-dark">삭제</button>
             <button onclick="excelDownload()" class="btn btn-primary btn-sm">엑셀다운</button>
+            <button onclick="openExcelModal()" class="btn btn-secondary btn-sm">일괄등록</button>
         </div>
 
         <div class="form_area">
@@ -231,10 +232,35 @@
             </div>
         </div>
 
+        <%--엑셀 일괄등록 모달--%>
+        <div id="axcel_modal">
+            <div class="inner">
+                <p>직원정보 일괄등록</p>
+                <p>직원정보를 일괄 등록하기 위한 엑셀 파일을 선택해주세요</p>
+                <form method="POST" action="${contextPath}/excel/save" enctype="multipart/form-data">
+                    <input type="file" id="file" name="file">
+                    <button type="submit">등록</button>
+                </form>
+
+                <div>
+                    <button id="close_excel_modal" onclick="closeExcel()">닫기</button>
+                </div>
+            </div>
+        </div>
+
 
     </div>
 </div>
 <script type="text/javascript">
+    //일괄등록 모달 오픈
+    function openExcelModal(){
+        debugger
+        $("#axcel_modal").show();
+    }
+    //일괄 등록 모달 닫기
+    function closeExcel(){
+        $("#axcel_modal").hide();
+    }
     // 엑셀 다운로드 버튼
     function excelDownload() {
         //url 파라미터 가지고 오기
@@ -801,6 +827,8 @@
         }
     }
     $(document).ready(function() {
+        //일괄등록 모달 숨김
+        $("#axcel_modal").hide();
 
         // 페이지 로드 시 URL 파라미터를 읽어와서 폼 필드에 설정
         function setFormFieldsFromURL() {
