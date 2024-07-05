@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.employee_system.mapper.ExcelMapper">
+    <!--직원 등록-->
+    <insert id="insertExcel" parameterType="com.example.employee_system.bean.dto.ExcelDto">
+        insert into
+            employee (  EMPLOY_ID, EMPLOY_NAME, EMPLOY_RANK, DEPARTMENT, PHONE, EMAIL, CREATE_AT)
+        values (#{employId}, #{employName}, #{employRank}, #{department},#{phone} ,#{email},now())
+    </insert>
+
+
+</mapper>
