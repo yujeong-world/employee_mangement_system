@@ -30,7 +30,7 @@ public interface EmployeeMapper {
     EmployeeDto selectEmployeeById(int id);
 
     //전체 직원 수 조회
-    int totalCount();
+    //int totalCount();
 
     //페이징 조회
     List<EmployeeDto> findEmployee(int offset, int limit);

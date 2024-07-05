@@ -70,11 +70,12 @@ public class EmployeeService {
 
     //전체 직원 수 조회
     public int getEmployeeCount(){
-        return employeeMapper.totalCount();
+        return employeeMapper.searchEmployeeCount(null,null);
     }
 
+    //삭제?
   // 페이징 처리하여 조회
-  public PageInfo<EmployeeDto> getAllEmployee(int pageIndex, int pageSize){
+  /*public PageInfo<EmployeeDto> getAllEmployee(int pageIndex, int pageSize){
       int totalCount = employeeMapper.totalCount(); // 전체 직원 수 조회
 
       if (totalCount <= pageSize) {
@@ -95,7 +96,7 @@ public class EmployeeService {
           return new PageInfo<>(pageIndex, pageSize, totalCount, employeeList);
       }
   }
-
+*/
     // 페이징 처리하여 검색된 직원 조회
     public PageInfo<EmployeeDto> getEmployeeBySearch(
             String category,

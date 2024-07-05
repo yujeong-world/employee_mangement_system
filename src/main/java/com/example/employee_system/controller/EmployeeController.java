@@ -44,7 +44,7 @@ public class EmployeeController {
             pageInfoVo.setPageIndex(1);
         }
 
-        if (pageInfoVo.getCategory() != null && pageInfoVo.getKeyword() != null &&
+       /* if (pageInfoVo.getCategory() != null && pageInfoVo.getKeyword() != null &&
                 !pageInfoVo.getCategory().isEmpty() && !pageInfoVo.getKeyword().isEmpty()) {
             // 검색 기능 활성화
             pageInfo = employeeService.getEmployeeBySearch(
@@ -52,8 +52,11 @@ public class EmployeeController {
                     pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
         } else {
             // 기본 목록 조회
-            pageInfo = employeeService.getAllEmployee(pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
-        }
+            pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
+                    pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
+        }*/
+        pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
+                pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
 
         mav.addObject("employeeList", pageInfo.getData());
         mav.addObject("totalCount", pageInfo.getTotalCount());
