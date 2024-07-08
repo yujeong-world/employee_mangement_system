@@ -41,8 +41,15 @@ th, td {
     border-bottom: 1px solid #444444;
     padding: 10px;
 }
+.page_area{
+    width: 100%;
+    display: flex;
+    margin-top: 20px;
+}
 .page_area ul{
     padding: 0;
+    margin: auto;
+    display: block;
 }
 .page_area ul li{
     list-style-type: none;
@@ -77,12 +84,13 @@ th, td {
     width: 20%;
     padding: 5px;
     margin: 3px;
+    font-size: 13px;
 }
 .form_area #searchForm select{
     height: 30px;
 }
 .form_area #searchForm input{
-    height: 24px;
+    height: 30px;
 }
 .form_area #searchForm{
     align-items: center;
@@ -94,6 +102,7 @@ th, td {
 }
 #searchForm button{
     height: 30px;
+    padding: 0;
 }
 a{
     text-decoration: none;

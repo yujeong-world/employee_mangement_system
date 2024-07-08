@@ -35,7 +35,7 @@ public class EmployeeService {
 
         if(idCheck == 0){
             //유효함
-            return "Vaild";
+            return "Valid";
         }else{
             //유효함
             return "이미 사용중인 아이디입니다.";
