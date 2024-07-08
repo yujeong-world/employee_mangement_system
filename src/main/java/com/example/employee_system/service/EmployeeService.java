@@ -62,7 +62,7 @@ public class EmployeeService {
         return employeeMapper.selectEmployeeById(id);
     }
 
-    //엑셀 직원 조회(카테고리, 검색어)
+    //엑셀 직원 조회(카테고리, 검색어) == 삭제 필요
     public List<EmployeeDto> getEmployListByCategoryAndSearch(String category, String keyword){
         return employeeMapper.selectEmployeeListByCategoryAndSearch(category, keyword);
     }

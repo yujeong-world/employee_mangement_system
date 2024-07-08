@@ -13,14 +13,22 @@
     <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/main.css?after">
     <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap-grid.min.css">
+    <!-- jsTree 스타일시트 -->
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css"
+    />
 <%--      제이쿼리 --%>
     <script type="text/javascript" src="${contextPath}/static/lib/jquery-3.6.3.min.js"></script>
     <script type="text/javascript" src="${contextPath}/static/js/bootstrap.js"></script>
+    <%--jstree--%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
 
 
 </head>
 
 <body>
+
 
 <div id="listInfo">
 
@@ -48,213 +56,233 @@
             </div>
         </div>
     </nav>--%>
-    <h3><a href="${contextPath}">직원 목록</a></h3>
-    <div class="table_top_container">
-        <div class="btn_area">
-            <button id="add_btn" class="btn btn-outline-primary" >등록</button>
-            <button id="modify_btn" onclick="modifyEmployInfo()" class="btn btn-outline-secondary">수정</button>
-            <button onclick="deleteemploy()" class="btn btn-outline-dark">삭제</button>
-            <button onclick="excelDownload()" class="btn btn-primary btn-sm">엑셀다운</button>
-            <button onclick="openExcelModal()" class="btn btn-secondary btn-sm">일괄등록</button>
+    <div class="tree_contriner">
+        <div>
+            <p>조직도</p>
+
+            <div>
+                조직도 영역입니다.
+            </div>
+
+            <div id="jstree"></div>
+
+            <div>
+                <button>추가</button>
+                <button>수정</button>
+                <button>삭제</button>
+            </div>
         </div>
 
-        <div class="form_area">
-            <form id="searchForm" action="${contextPath}" method="GET">
-                <%--<select name="category" id="category">
-                    <option value="name">직원명</option>
-                    <option value="id">직원 번호</option>
-                    <option value="rank">직급</option>
-                    <option value="phone">전화번호</option>
-                    <option value="email">이메일</option>
-                </select>--%>
-                <%--부트스트랩수정--%>
-                <select class="form-select" name="category" id="category" aria-label="Default select example">
-                    <option value="name">직원명</option>
-                    <option value="id">직원 번호</option>
-                    <option value="rank">직급</option>
-                    <option value="phone">전화번호</option>
-                    <option value="email">이메일</option>
-                </select>
-
-                <select name="pageSize" id="pageSize">
-                    <option value="10">10개씩 보기</option>
-                    <option value="5">5개씩 보기</option>
-                    <option value="15">15개씩 보기</option>
-                    <option value="20">20개씩 보기</option>
-                    <option value="50">50개씩 보기</option>
-                </select>
-                <input id="keyword" type="text" name="keyword" placeholder="검색어를 입력하세요." value="${param.keyword}" required>
-                <input readonly name="pageIndex" type="hidden">
-                <input readonly name="pageSize" type="hidden">
-                <button type="submit" class="btn btn-outline-secondary">검색</button>
-            </form>
-        </div>
     </div>
-
-
-
     <div>
+        <h3><a href="${contextPath}">직원 목록</a></h3>
+        <div class="table_top_container">
+            <div class="btn_area">
+                <button id="add_btn" class="btn btn-outline-primary" >등록</button>
+                <button id="modify_btn" onclick="modifyEmployInfo()" class="btn btn-outline-secondary">수정</button>
+                <button onclick="deleteemploy()" class="btn btn-outline-dark">삭제</button>
+                <button onclick="excelDownload()" class="btn btn-primary btn-sm">엑셀다운</button>
+                <button onclick="openExcelModal()" class="btn btn-secondary btn-sm">일괄등록</button>
+            </div>
+
+            <div class="form_area">
+                <form id="searchForm" action="${contextPath}" method="GET">
+                    <%--<select name="category" id="category">
+                        <option value="name">직원명</option>
+                        <option value="id">직원 번호</option>
+                        <option value="rank">직급</option>
+                        <option value="phone">전화번호</option>
+                        <option value="email">이메일</option>
+                    </select>--%>
+                    <%--부트스트랩수정--%>
+                    <select class="form-select" name="category" id="category" aria-label="Default select example">
+                        <option value="name">직원명</option>
+                        <option value="id">직원 번호</option>
+                        <option value="rank">직급</option>
+                        <option value="phone">전화번호</option>
+                        <option value="email">이메일</option>
+                    </select>
+
+                    <select name="pageSize" id="pageSize">
+                        <option value="10">10개씩 보기</option>
+                        <option value="5">5개씩 보기</option>
+                        <option value="15">15개씩 보기</option>
+                        <option value="20">20개씩 보기</option>
+                        <option value="50">50개씩 보기</option>
+                    </select>
+                    <input id="keyword" type="text" name="keyword" placeholder="검색어를 입력하세요." value="${param.keyword}" required>
+                    <input readonly name="pageIndex" type="hidden">
+                    <input readonly name="pageSize" type="hidden">
+                    <button type="submit" class="btn btn-outline-secondary">검색</button>
+                </form>
+            </div>
+        </div>
+
+
 
         <div>
-            <table>
-                <thead>
-                <tr>
-                    <th>선택</th>
-                    <th>직원번호</th>
-                    <th>직원이름</th>
-                    <th>부서</th>
-                    <th>직급</th>
-                    <th>전화번호</th>
-                    <th>이메일</th>
-                    <th>직원정보 메일발송</th>
 
-                </tr>
-                </thead>
-                <tbody>
-
-
-                <c:forEach items="${employeeList}" var="list">
+            <div>
+                <table>
+                    <thead>
                     <tr>
-                        <td>
-                            <input type="checkbox" name="option" value="${list.employId}" id="check"
-                                   onclick="getCheckValue(event)">
-                        </td>
+                        <th>선택</th>
+                        <th>직원번호</th>
+                        <th>직원이름</th>
+                        <th>부서</th>
+                        <th>직급</th>
+                        <th>전화번호</th>
+                        <th>이메일</th>
+                        <th>직원정보 메일발송</th>
 
-                        <td>${list.employId}</td>
-
-                        <td>
-                            <a onclick="detail(${list.employId})">${list.employName}</a>
-                        </td>
-
-                        <td>${list.department}</td>
-
-                        <td>${list.employRank}</td>
-                        <td>${list.phone}</td>
-                        <td>${list.email}</td>
-                        <td><button id="mail_submit" onclick="mailSubmit(${list.employId})">메일 발송하기</button></td>
                     </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
 
 
-        <div>
-            총 ${totalCount} 건
-        </div>
+                    <c:forEach items="${employeeList}" var="list">
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="option" value="${list.employId}" id="check"
+                                       onclick="getCheckValue(event)">
+                            </td>
 
-        <%--페이지 바--%>
-        <div class="page_area">
-            <ul>
-                <c:forEach begin="1" end="${pageBar}" var="pageNum">
-                    <li><a href="javascript:void(0);" class="page-link" data-page="${pageNum}">${pageNum}</a></li>
-                </c:forEach>
-            </ul>
+                            <td>${list.employId}</td>
 
-        </div>
+                            <td>
+                                <a onclick="detail(${list.employId})">${list.employName}</a>
+                            </td>
+
+                            <td>${list.department}</td>
+
+                            <td>${list.employRank}</td>
+                            <td>${list.phone}</td>
+                            <td>${list.email}</td>
+                            <td><button id="mail_submit" onclick="mailSubmit(${list.employId})">메일 발송하기</button></td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
 
 
-        <div class="background">
+            <div>
+                총 ${totalCount} 건
+            </div>
 
-        </div>
+            <%--페이지 바--%>
+            <div class="page_area">
+                <ul>
+                    <c:forEach begin="1" end="${pageBar}" var="pageNum">
+                        <li><a href="javascript:void(0);" class="page-link" data-page="${pageNum}">${pageNum}</a></li>
+                    </c:forEach>
+                </ul>
 
-        <div id="add_modal">
-            <div class="inner">
-                <p class="title"> </p>
-                <div>
+            </div>
+
+
+            <div class="background">
+
+            </div>
+
+            <div id="add_modal">
+                <div class="inner">
+                    <p class="title"> </p>
+                    <div>
+                        <form>
+                            <div>
+                                <label>직원번호</label>
+                                <input type="number" id="employId" placeholder="직원번호를 입력하세요" onchange="employeeIdChange()">
+                                <button id="phone_check" onclick="idCheck(event)">중복체크</button>
+                                <span id="checkResult"></span>
+                            </div>
+                            <div>
+                                <label>직원명</label>
+                                <input type="text" id="employName" placeholder="직원이름을 입력하세요">
+                            </div>
+                            <div>
+                                <label>부서</label>
+                                <input type="text" id="department" placeholder="부서명을 입력하세요">
+                            </div>
+                            <div>
+                                <label>직급</label>
+                                <input type="text" id="employRank" placeholder="직급을 입력하세요">
+                            </div>
+                            <div>
+                                <label>전화번호</label>
+                                <input type="text" id="phone" placeholder="전화번호을 입력하세요">
+                            </div>
+                            <div>
+                                <label>이메일</label>
+                                <input type="text" id="email" placeholder="이메일을 입력하세요">
+                                <span>@</span>
+                                <select name="email_option" id="email_option">
+                                    <option value="none">=== 메일 선택 ===</option>
+                                    <option value="@naver.com">naver.com</option>
+                                    <option value="@gmail.com">gmail.com</option>
+                                    <option value="@nate.com">nate.com</option>
+                                    <option value="user_input">직접입력</option>
+                                </select>
+                                <input type="text" id="email2" placeholder="이메일 직접입력">
+
+                            </div>
+                        </form>
+
+                        <%--파일 업로드 영역--%>
+                        <div class="file_upload">
+                            <p>직원 파일 업로드</p>
+                            <button class="plus" onclick="plus()">파일추가+</button>
+                        </div>
+
+                        <%--저장된 파일 출력--%>
+                        <div class="saved_file">
+                            <h3>저장된 파일</h3>
+                            <div class="file_list">
+                                <p>파일 아이디 : <span id="file_id"></span></p>
+                                <p>파일 이름 : <span id="save_saveName"></span></p>
+                                <p>파일 원본이름 : <span id="save_originalName"></span></p>
+                                <p>파일 등록일 : <span id="save_createAt"></span></p>
+                            </div>
+
+                            <%-- <button class="deleteFile" onclick="deleteFile()">파일삭제</button>--%>
+                        </div>
+
+                        <button type="button" id="addMember" onclick="addMember()">직원등록</button>
+                        <button type="button" id="modifyMember" onclick="modifyMember()">직원수정</button>
+                    </div>
+
+                    <button class="close">창 닫기</button>
+
+
+
+
+                </div>
+            </div>
+
+            <%--엑셀 일괄등록 모달--%>
+            <div id="axcel_modal">
+                <div class="inner">
+                    <p>직원정보 일괄등록</p>
+                    <p>직원정보를 일괄 등록하기 위한 엑셀 파일을 선택해주세요</p>
                     <form>
-                        <div>
-                            <label>직원번호</label>
-                            <input type="number" id="employId" placeholder="직원번호를 입력하세요" onchange="employeeIdChange()">
-                            <button id="phone_check" onclick="idCheck(event)">중복체크</button>
-                            <span id="checkResult"></span>
-                        </div>
-                        <div>
-                            <label>직원명</label>
-                            <input type="text" id="employName" placeholder="직원이름을 입력하세요">
-                        </div>
-                        <div>
-                            <label>부서</label>
-                            <input type="text" id="department" placeholder="부서명을 입력하세요">
-                        </div>
-                        <div>
-                            <label>직급</label>
-                            <input type="text" id="employRank" placeholder="직급을 입력하세요">
-                        </div>
-                        <div>
-                            <label>전화번호</label>
-                            <input type="text" id="phone" placeholder="전화번호을 입력하세요">
-                        </div>
-                        <div>
-                            <label>이메일</label>
-                            <input type="text" id="email" placeholder="이메일을 입력하세요">
-                            <span>@</span>
-                            <select name="email_option" id="email_option">
-                                <option value="none">=== 메일 선택 ===</option>
-                                <option value="@naver.com">naver.com</option>
-                                <option value="@gmail.com">gmail.com</option>
-                                <option value="@nate.com">nate.com</option>
-                                <option value="user_input">직접입력</option>
-                            </select>
-                            <input type="text" id="email2" placeholder="이메일 직접입력">
-
-                        </div>
+                        <input type="file" id="file" name="file">
+                        <button type="submit" onclick="excelAddBth(event)">등록</button>
                     </form>
 
-                    <%--파일 업로드 영역--%>
-                    <div class="file_upload">
-                        <p>직원 파일 업로드</p>
-                        <button class="plus" onclick="plus()">파일추가+</button>
+                    <div>
+                        <button id="close_excel_modal" onclick="closeExcel()">닫기</button>
                     </div>
-
-                    <%--저장된 파일 출력--%>
-                    <div class="saved_file">
-                        <h3>저장된 파일</h3>
-                        <div class="file_list">
-                            <p>파일 아이디 : <span id="file_id"></span></p>
-                            <p>파일 이름 : <span id="save_saveName"></span></p>
-                            <p>파일 원본이름 : <span id="save_originalName"></span></p>
-                            <p>파일 등록일 : <span id="save_createAt"></span></p>
-                        </div>
-
-                       <%-- <button class="deleteFile" onclick="deleteFile()">파일삭제</button>--%>
-                    </div>
-
-                    <button type="button" id="addMember" onclick="addMember()">직원등록</button>
-                    <button type="button" id="modifyMember" onclick="modifyMember()">직원수정</button>
-                </div>
-
-                <button class="close">창 닫기</button>
-
-
-
-
-            </div>
-        </div>
-
-        <%--엑셀 일괄등록 모달--%>
-        <div id="axcel_modal">
-            <div class="inner">
-                <p>직원정보 일괄등록</p>
-                <p>직원정보를 일괄 등록하기 위한 엑셀 파일을 선택해주세요</p>
-                <form>
-                    <input type="file" id="file" name="file">
-                    <button type="submit" onclick="excelAddBth(event)">등록</button>
-                </form>
-
-                <div>
-                    <button id="close_excel_modal" onclick="closeExcel()">닫기</button>
                 </div>
             </div>
+
+
         </div>
-
-
     </div>
+
 </div>
 <script type="text/javascript">
     //일괄등록 모달 오픈
     function openExcelModal(){
-        debugger
         $("#axcel_modal").show();
     }
     //일괄 등록 모달 닫기
@@ -700,7 +728,6 @@
         data = {"employId" : Number(employId)};
         console.log(employId+"메일 발송 test");
         console.log(typeof employId+"메일 발송 test");
-        debugger
         $.ajax({
             url: "${contextPath}/email",
             type: 'POST',
@@ -1014,6 +1041,104 @@
         });
     }
 
+    //jstree
+    /*$('#jstree').jstree({
+        'core' : {
+            'data' : [
+                { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+                { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+                { "id" : "ajson3", "parent" : "ajson2", "text" : "Child 1" },
+                { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+            ]
+        }
+    });*/
+    //출처: https://mine-it-record.tistory.com/361 [나만의 기록들:티스토리]
+/*    function getJson() {
+        debugger
+        $.ajax({
+            type:'get',
+            url:'${contextPath}/tree/list',
+            dataType:'json',
+            success: function(data) {
+                debugger
+                var company = new Array();
+                // 데이터 받아옴
+                $.each(data, function(idx, item){
+                    company[idx] = {id:item.id, parent:item.parent_id, text:item.name};
+                });
+                console.log(company+"데이터")
+                debugger
+
+                // 트리 생성
+                $('#jstree').jstree({
+                    core: {
+                        data: company    //데이터 연결
+                    },
+                    types: {
+                        'default': {
+                            'icon': 'jstree-folder'
+                        }
+                    },
+                    plugins: ['wholerow', 'types']
+                })
+                    .bind('loaded.jstree', function(event, data){
+                        //트리 로딩 롼료 이벤트
+                    })
+                    .bind('select_node.jstree', function(event, data){
+                        //노드 선택 이벤트
+                    })
+
+            },
+            error:function (data) {
+                alert("에러"+data);
+            }
+        });
+    }*/
+    function getJson() {
+        $.ajax({
+            type: 'GET',
+            url: '${contextPath}/tree/list',
+            dataType: 'json',
+            success: function(data) {
+                debugger
+                var company = [];
+                debugger
+                // 데이터 받아옴
+                $.each(data, function(idx, item) {
+                    company.push({ id: item.id, parent: item.parent_id, text: item.name });
+                });
+                console.log("데이터: ", company);
+                debugger
+                // 트리 생성
+                $('#jstree').jstree({
+                    'core': {
+                        'data': company    // 데이터 연결
+                    },
+                    'types': {
+                        'default': {
+                            'icon': 'jstree-folder'
+                        }
+                    },
+                    'plugins': ['wholerow', 'types']
+                })
+                    .bind('loaded.jstree', function(event, data) {
+                        // 트리 로딩 완료 이벤트
+                        console.log('Tree loaded');
+                    })
+                    .bind('select_node.jstree', function(event, data) {
+                        // 노드 선택 이벤트
+                        console.log('Node selected', data.node);
+                    });
+            },
+            error: function(data) {
+                alert("에러: " + JSON.stringify(data));
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        getJson();
+    });
 
 
 </script>

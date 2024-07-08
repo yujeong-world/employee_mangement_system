@@ -47,11 +47,6 @@
         where EMPLOY_ID=#{employId}
     </delete>
 
-
-<!--    <select id="findEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee limit #{limit} offset #{offset}
-    </select>-->
-
     <!--검색 기능-->
     <sql id="searchConditions">
         <where>
@@ -83,10 +78,6 @@
         limit #{pageSize} offset #{pageIndex}
     </select>
 
-    <!--총 개시물 개수 반환-->
-<!--    <select id="totalCount" resultType="int">
-        select count(*) from employee
-    </select>-->
 
     <!-- 검색된 직원 수 조회 -->
     <select id="searchEmployeeCount" resultType="int">

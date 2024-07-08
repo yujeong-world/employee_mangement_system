@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.employee_system.mapper.TreeMapper">
+    <select id="getTree" resultType="com.example.employee_system.bean.dto.TreeDto">
+        WITH RECURSIVE CTE (id, name, depth, parent_id) AS
+                           (
+                               SELECT t1.id, t1.name, t1.depth, t1.parent_id
+                               FROM tree t1
+                               WHERE t1.parent_id = -1
+
+                               UNION ALL
+
+                               SELECT t2.id, t2.name, t2.depth, t2.parent_id
+                               FROM tree t2
+                                        INNER JOIN CTE ON t2.parent_id = CTE.id
+                           )
+
+        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent_id FROM CTE
+        ORDER BY CTE.id;
+    </select>
+
+</mapper>
