@@ -237,9 +237,9 @@
             <div class="inner">
                 <p>직원정보 일괄등록</p>
                 <p>직원정보를 일괄 등록하기 위한 엑셀 파일을 선택해주세요</p>
-                <form method="POST" action="${contextPath}/excel/save" enctype="multipart/form-data">
+                <form>
                     <input type="file" id="file" name="file">
-                    <button type="submit">등록</button>
+                    <button type="submit" onclick="excelAddBth(event)">등록</button>
                 </form>
 
                 <div>
@@ -267,8 +267,8 @@
         let urlSearch = new URLSearchParams(location.search);
         let category = urlSearch.get('category')
         let keyword = urlSearch.get('keyword')
-        //var category = encodeURIComponent("yourCategory"); // 필요에 따라 카테고리 값을 설정하세요
-        //var keyword = encodeURIComponent("yourKeyword"); // 필요에 따라 키워드 값을 설정하세요
+        //var category = encodeURIComponent("yourCategory"); // 카테고리 값을 설정
+        //var keyword = encodeURIComponent("yourKeyword"); //  키워드 값을 설정
         var url = "${contextPath}/excel/download?category=" + category + "&keyword=" + keyword;
         //var url = "${contextPath}/excel/download";
         window.location.href = url;
@@ -991,6 +991,28 @@
 
     }
 
+    //엑셀 직원정보 일괄 등록 - 등록 버튼
+    function excelAddBth(event) {
+        event.preventDefault(); // 기본 동작을 막음(form 태그)
+
+        let formData = new FormData();
+        formData.append("file", $("#file")[0].files[0]);
+
+        $.ajax({
+            type: 'POST',
+            url: "${contextPath}/excel/save",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                alert("파일 업로드 결과.\n" + response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("업로드에 실패하였습니다:", textStatus, errorThrown);
+                alert("업로드에 실패하였습니다: " + textStatus + "\n" + errorThrown);
+            }
+        });
+    }
 
 
 
