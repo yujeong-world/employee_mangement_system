@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 <html lang="ko">
@@ -289,7 +289,7 @@
             contentType: 'application/json; charset=utf-8',
         }).done(function(response) {
             console.log(response + ' 리턴 체크');
-            if (response === 'Vaild') {
+            if (response === 'Valid') {
 
                 alert('사용 가능한 직원번호입니다.');
                 $("#checkResult").text('사용가능');

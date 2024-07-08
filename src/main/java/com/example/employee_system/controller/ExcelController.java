@@ -9,6 +9,7 @@ import com.example.employee_system.service.ExcelService;
 import com.example.employee_system.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -111,7 +112,7 @@ public class ExcelController {
     }
 
     //엑셀 직원 정보 일괄 등록하기
-    @PostMapping("/save")
+    /*@PostMapping("/save")
     public ResponseEntity<String> save(@RequestParam("file") MultipartFile file, Model model) throws IOException {
         System.out.println("filename :" + file.getOriginalFilename());
 
@@ -137,12 +138,18 @@ public class ExcelController {
                 return ResponseEntity.ok(row.getRowNum()+"번째 행의 직원 코드가 유효하지 않습니다. 확인해주세요");
             }
             //직원 코드
-            /*int employId = 0;
+            *//*int employId = 0;
             try {
                 formatter.formatCellValue(row.getCell(0));
             }catch (Exception e){
                 log.error(e.getMessage(), e);
-            }*/
+            }*//*
+
+            try {
+
+            }catch (Exception e){
+                //try에서 발생한 예외를  처리하는 코드
+            }
 
             //직원명
             String employName = formatter.formatCellValue(row.getCell(1));
@@ -186,5 +193,186 @@ public class ExcelController {
         return ResponseEntity.ok("일괄 등록에 성공하였습니다.");
 
 
+    }*/
+
+/*    @PostMapping("/save")
+    public ResponseEntity<String> save(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        System.out.println("filename :" + file.getOriginalFilename());
+
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        DataFormatter dataFormatter = new DataFormatter();
+
+        int successCount = 0;
+        int failureCount = 0;
+        StringBuilder failureDetails = new StringBuilder();
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            ExcelDto excel = new ExcelDto();
+            XSSFRow row = sheet.getRow(i);
+
+            try {
+                // 직원 코드
+                int employId = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(0)));
+
+                // 직원 코드의 중복 요소 체크
+                String checkMsg = employeeService.idCheck(employId);
+                if (!"Valid".equals(checkMsg)) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 직원 코드.\n");
+                    continue;
+                }
+
+                // 직원명
+                String employName = dataFormatter.formatCellValue(row.getCell(1));
+                // 부서
+                String department = dataFormatter.formatCellValue(row.getCell(2));
+                // 직급
+                String rank = dataFormatter.formatCellValue(row.getCell(3));
+                // 휴대폰 번호
+                String phone = dataFormatter.formatCellValue(row.getCell(4));
+                // 이메일
+                String email = dataFormatter.formatCellValue(row.getCell(5));
+
+                // 유효성 검증
+                if (employName == null || employName.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 직원명이 없습니다.\n");
+                    continue;
+                }
+                if (department == null || department.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 부서가 없습니다.\n");
+                    continue;
+                }
+                if (rank == null || rank.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 직급이 없습니다.\n");
+                    continue;
+                }
+                if (phone == null || phone.isEmpty() || !phone.matches("^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$")) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 휴대폰 번호.\n");
+                    continue;
+                }
+                if (email == null || email.isEmpty() || !email.matches("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$")) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 이메일 주소.\n");
+                    continue;
+                }
+
+                excel.setEmployId(employId);
+                excel.setEmployName(employName);
+                excel.setDepartment(department);
+                excel.setEmployRank(rank);
+                excel.setPhone(phone);
+                excel.setEmail(email);
+
+                excelService.insertExcel(excel);
+                successCount++;
+            } catch (Exception e) {
+                failureCount++;
+                failureDetails.append("Row ").append(i + 1).append(": 예외 발생 - ").append(e.getMessage()).append("\n");
+            }
+        }
+
+        String resultMessage = String.format("일괄 등록 완료. 성공: %d, 실패: %d.\n%s", successCount, failureCount, failureDetails.toString());
+
+        return ResponseEntity.ok(resultMessage);
+    }*/
+
+    @PostMapping("/save")
+    public ResponseEntity<String> save(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        System.out.println("filename :" + file.getOriginalFilename());
+
+        // 파일 확장자 확인
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        if (!"xlsx".equalsIgnoreCase(extension) && !"xls".equalsIgnoreCase(extension)) {
+            return ResponseEntity.badRequest().body("엑셀 파일(.xlsx, .xls)만 등록할 수 있습니다.");
+        }
+
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        DataFormatter dataFormatter = new DataFormatter();
+
+        int successCount = 0;
+        int failureCount = 0;
+        StringBuilder failureDetails = new StringBuilder();
+
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            ExcelDto excel = new ExcelDto();
+            XSSFRow row = sheet.getRow(i);
+
+            try {
+                // 직원 코드
+                int employId = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(0)));
+
+                // 직원 코드의 중복 요소 체크
+                String checkMsg = employeeService.idCheck(employId);
+                if (!"Valid".equals(checkMsg)) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 직원 코드.\n");
+                    continue;
+                }
+
+                // 직원명
+                String employName = dataFormatter.formatCellValue(row.getCell(1));
+                // 부서
+                String department = dataFormatter.formatCellValue(row.getCell(2));
+                // 직급
+                String rank = dataFormatter.formatCellValue(row.getCell(3));
+                // 휴대폰 번호
+                String phone = dataFormatter.formatCellValue(row.getCell(4));
+                // 이메일
+                String email = dataFormatter.formatCellValue(row.getCell(5));
+
+                // 유효성 검증
+                if (employName == null || employName.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 직원명이 없습니다.\n");
+                    continue;
+                }
+                if (department == null || department.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 부서가 없습니다.\n");
+                    continue;
+                }
+                if (rank == null || rank.isEmpty()) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 직급이 없습니다.\n");
+                    continue;
+                }
+                if (phone == null || phone.isEmpty() || !phone.matches("^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}$")) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 휴대폰 번호.\n");
+                    continue;
+                }
+                if (email == null || email.isEmpty() || !email.matches("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$")) {
+                    failureCount++;
+                    failureDetails.append("Row ").append(i + 1).append(": 유효하지 않은 이메일 주소.\n");
+                    continue;
+                }
+
+                excel.setEmployId(employId);
+                excel.setEmployName(employName);
+                excel.setDepartment(department);
+                excel.setEmployRank(rank);
+                excel.setPhone(phone);
+                excel.setEmail(email);
+
+                excelService.insertExcel(excel);
+                successCount++;
+            } catch (Exception e) {
+                failureCount++;
+                failureDetails.append("Row ").append(i + 1).append(": 예외 발생 - ").append(e.getMessage()).append("\n");
+            }
+        }
+
+        String resultMessage = String.format("일괄 등록 완료. 성공: %d, 실패: %d.\n%s", successCount, failureCount, failureDetails.toString());
+
+        return ResponseEntity.ok(resultMessage);
     }
+
 }
