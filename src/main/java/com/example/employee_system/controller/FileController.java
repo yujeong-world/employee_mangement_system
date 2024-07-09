@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
 
 @Controller
 public class FileController {
@@ -51,13 +52,18 @@ public class FileController {
     }
 
     // 파일 삭제하기
-    @PostMapping("/fileDelete/{id}")
-    public ModelAndView fileDelete(@PathVariable String id) {
+    @PostMapping("/fileDelete")
+    @ResponseBody
+    public ModelAndView fileDelete(@RequestBody List<Long> fileId) {
         //형 변환
-        long fileId = Long.parseLong(id);
+       // long fileId = Long.parseLong(id);
 
         ModelAndView modelAndView = new ModelAndView();
-        fileService.deleteFile(fileId);
+        for(long id : fileId) {
+            fileService.deleteFile(id);
+
+        }
+        //fileService.deleteFile(fileId);
         return new ModelAndView("redirect:/");
     }
 
