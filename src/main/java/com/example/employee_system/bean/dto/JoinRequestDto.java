@@ -17,4 +17,5 @@ import java.util.List;
 public class JoinRequestDto {
     private EmployeeVo employeeVo;
     private List<FileVo> fileVo;
+    private List<Integer> deleteList;
 }

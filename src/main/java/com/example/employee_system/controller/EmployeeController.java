@@ -176,6 +176,13 @@ public class EmployeeController {
                 fileService.fileSave(file, fileBytes);
             }
 
+            //파일 삭제 로직
+            if(joinRequestDto.getDeleteList() != null){
+                for(int fileId : joinRequestDto.getDeleteList()){
+                    fileService.deleteFile(Long.valueOf(fileId));
+                }
+            }
+
 
             return ResponseEntity.ok("success");
         } catch (Exception e) {
