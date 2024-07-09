@@ -389,6 +389,13 @@
             return;
         }
 
+        // 파일이 최소 1개 이상 등록되었는지 확인
+        var totalFiles = $(".file_upload_form input[type='file']").length;
+        if (totalFiles === 0) {
+            alert("파일을 최소 1개 이상 등록해주세요.");
+            return;
+        }
+
         var formData = {
             "employeeVo": {
                 "employId": employId,
@@ -576,11 +583,18 @@
     }
 
     let delete_file_list = [];
+    var countClick = 1;
 
     function deleteFile(id) {
-        // UI에서 안보이도록 처리
+        let visibleFileCount = $(".saved_file .file_list > div").filter(function() {
+            return $(this).css('display') !== 'none';
+        }).length;
+
+        if (visibleFileCount <= 1) {
+            alert("파일을 전부 삭제할 수 없습니다. 최소 1개의 파일이 필요합니다.");
+            return;
+        }
         let file = ".file_item_" + id;
-        // 삭제 데이터 id 저장
         delete_file_list.push(Number(id));
         console.log("파일 삭제 ", delete_file_list);
         $(file).hide();
@@ -672,100 +686,6 @@
         }
     }
 
-    //직원 수정 모달 - 파일 삭제
-    /*let delete_file_list = []
-    function deleteFile(id) {
-
-        //UI에서 안보이도록 처리
-        let file = ".file_item_"+id;
-        //삭제 데이터 id 저장
-        delete_file_list.push(Number(id))
-        console.log("파일 삭제 ", delete_file_list);
-        $(file).hide();
-    }
-    // 직원 수정 모달 - 수정 버튼
-    function modifyMember(){
-        var employId = Number($("#employId").val());
-        var employName = $("#employName").val();
-        var employRank = $("#employRank").val();
-        var phone = $("#phone").val();
-        var email = assembleEmail();
-        var saveName = $("#saveName").val();
-
-        // 유효성 검사
-        if ($("#checkResult").text() == '사용불가' || $("#checkResult").text() == '') {
-            alert("직원 번호를 확인해주세요");
-            return;
-        }
-
-        if (!validateEmail(email)) {
-            alert("이메일을 올바르게 입력해주세요.");
-            return;
-        }
-
-        if (!validateName(employName)) {
-            alert("이름을 올바르게 입력해주세요.");
-            return;
-        }
-
-        if (!validatePhone(phone)) {
-            alert("휴대폰번호를 올바르게 입력해주세요.");
-            return;
-        }
-
-        var formData = {
-            "employeeVo": {
-                "employId": employId,
-                "employName": employName,
-                "employRank": employRank,
-                "phone": phone,
-                "email": email
-            },
-            "fileVo": [],
-            "deleteList": [],
-        };
-
-        // 파일 데이터 추가
-        var filesProcessed = 0;
-        var totalFiles = $(".file_upload_form input[type='file']").length;
-        formData.deleteList.push(delete_file_list);
-
-        console.log(formData.deleteList, "삭제 데이터 리스트");
-        debugger
-
-        $(".file_upload_form input[type='file']").each(function(index, fileInput) {
-            var file = fileInput.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var arrayBuffer = e.target.result;
-                    var bytes = new Uint8Array(arrayBuffer);
-                    var binaryString = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
-                    var encodedFile = btoa(binaryString); // Base64 인코딩
-
-                    formData.fileVo.push({
-                        "saveName": saveName,
-                        "originalName": file.name,
-                        "fileData": encodedFile // Base64 인코딩된 파일 데이터
-                    });
-
-                    filesProcessed++;
-                    if (filesProcessed === totalFiles) {
-                        // 모든 파일이 처리되면 AJAX 요청을 보냅니다.
-                        sendModifyRequest(formData);
-                    }
-                };
-                reader.readAsArrayBuffer(file); // 파일을 읽고 Base64 인코딩
-            } else {
-                filesProcessed++;
-            }
-        });
-
-        // 파일이 없을 경우에도 폼 데이터를 전송합니다.
-        if (totalFiles === 0) {
-            sendModifyRequest(formData);
-        }
-    }*/
 
     // AJAX 요청을 보내는 함수
     function sendModifyRequest(formData) {
@@ -783,28 +703,6 @@
             alert(JSON.stringify(error));
         });
     }
-    //직원 수정 모달 - 파일 삭제
-   /* function deleteFile(id) {
-        //UI에서 안보이도록 처리
-        let file = ".file_item_" + id;
-        $(file).hide();
-    }*/
-       /* $.ajax({
-            url: "${contextPath}/fileDelete/" + id,
-            type: 'POST',
-            async: false,
-            success: function(data) {
-                console.log(data);
-                let fileHtmlId = ".file_item_" + id;
-                $(fileHtmlId).hide();
-                alert("파일이 삭제되었습니다.");
-            },
-            error: function(e) {
-                alert("파일 삭제에 실패하였습니다.");
-                console.error(e);
-            }
-        });*/
-    //}
 
 
     //검색
