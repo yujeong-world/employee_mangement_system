@@ -17,9 +17,9 @@ public class EmployeeService {
     private EmployeeMapper employeeMapper;
 
     //직원 목록 조회
-    public List<EmployeeDto> employeeList(){
+/*    public List<EmployeeDto> employeeList(){
         return employeeMapper.selectEmployeeList();
-    }
+    }*/
 
     //직원 등록
     @Transactional
@@ -62,16 +62,25 @@ public class EmployeeService {
         return employeeMapper.selectEmployeeById(id);
     }
 
-    //엑셀 직원 조회(카테고리, 검색어)
+    //엑셀 직원 조회(카테고리, 검색어) == 삭제 필요
     public List<EmployeeDto> getEmployListByCategoryAndSearch(String category, String keyword){
         return employeeMapper.selectEmployeeListByCategoryAndSearch(category, keyword);
     }
 
+    //조회 새로
+    public List<EmployeeDto> getEmployList(String category, String keyword, int pageIndex, int pageSize){
+        return employeeMapper.searchEmployee(category, keyword, pageIndex, pageSize);
+    }
 
     //전체 직원 수 조회
     public int getEmployeeCount(){
         return employeeMapper.searchEmployeeCount(null,null);
     }
+
+    //직원 조회
+    /*public EmployeeDto searchEmployee(String category, String keyword, int pageIndex, int pageSize){
+        return employeeMapper.searchEmployee(category,keyword,pageIndex,pageSize);
+    }*/
 
     //삭제?
   // 페이징 처리하여 조회

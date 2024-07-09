@@ -1,14 +1,13 @@
 package com.example.employee_system.controller;
 
-import com.example.employee_system.bean.dto.EmployeeDto;
-import com.example.employee_system.bean.dto.FileDto;
-import com.example.employee_system.bean.dto.JoinRequestDto;
-import com.example.employee_system.bean.dto.RequestDto;
+import com.example.employee_system.bean.dto.*;
 import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.service.EmployeeService;
 import com.example.employee_system.service.FileService;
+import com.example.employee_system.service.TreeService;
 import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,16 +18,13 @@ import java.util.Base64;
 import java.util.List;
 
 @Controller
+@AllArgsConstructor
 public class EmployeeController {
 
     private final EmployeeService employeeService;
     private final FileService fileService;
+    private final TreeService treeService;
 
-
-    public EmployeeController(EmployeeService employeeService, FileService fileService) {
-        this.employeeService = employeeService;
-        this.fileService = fileService;
-    }
 
     @GetMapping("/")
     public ModelAndView employeeList(@ModelAttribute PageInfoVo pageInfoVo) {
@@ -44,17 +40,8 @@ public class EmployeeController {
             pageInfoVo.setPageIndex(1);
         }
 
-       /* if (pageInfoVo.getCategory() != null && pageInfoVo.getKeyword() != null &&
-                !pageInfoVo.getCategory().isEmpty() && !pageInfoVo.getKeyword().isEmpty()) {
-            // 검색 기능 활성화
-            pageInfo = employeeService.getEmployeeBySearch(
-                    pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
-                    pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
-        } else {
-            // 기본 목록 조회
-            pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
-                    pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
-        }*/
+/*        List<TreeDto> trees = treeService.getTree();
+        return trees;*/
         pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
                 pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
 

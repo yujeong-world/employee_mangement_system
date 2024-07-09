@@ -51,12 +51,13 @@ public class ExcelController {
 
         List<EmployeeDto> employees;
         // 검색어가 없을 때
-        if (category == null || keyword == null) {
+        /*if (category == null || keyword == null) {
             employees = employeeService.employeeList();
         } else {
             // 검색어가 존재 할 때
             employees = employeeService.getEmployListByCategoryAndSearch(category, keyword);
-        }
+        }*/
+        employees = employeeService.getEmployList(category, keyword, 0, 0);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Employees");

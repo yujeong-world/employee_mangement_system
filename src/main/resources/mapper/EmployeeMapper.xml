@@ -2,9 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.employee_system.mapper.EmployeeMapper">
 
-    <select id="selectEmployeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee order by employ_id
+<!--    <select id="selectEmployeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee
+    </select>-->
+
+    <select id="employeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        select * from employee
     </select>
+
 
     <!--직원 아이디 중복 조회 -->
     <select id="idCheck" resultType="int">
@@ -47,11 +52,6 @@
         where EMPLOY_ID=#{employId}
     </delete>
 
-
-<!--    <select id="findEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee limit #{limit} offset #{offset}
-    </select>-->
-
     <!--검색 기능-->
     <sql id="searchConditions">
         <where>
@@ -76,17 +76,20 @@
         </where>
     </sql>
 
+    <!-- 공통 페이지네이션 조건 -->
+    <sql id="pagination">
+        <if test="pageSize != null and pageSize > 0 and pageIndex != null and pageIndex >= 0">
+            LIMIT #{pageSize} OFFSET #{pageIndex}
+        </if>
+    </sql>
+
     <!-- 직원 검색 결과 조회 -->
     <select id="searchEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
         select * from employee
         <include refid="searchConditions"/>
-        limit #{pageSize} offset #{pageIndex}
+        <include refid="pagination"/>
     </select>
 
-    <!--총 개시물 개수 반환-->
-<!--    <select id="totalCount" resultType="int">
-        select count(*) from employee
-    </select>-->
 
     <!-- 검색된 직원 수 조회 -->
     <select id="searchEmployeeCount" resultType="int">
@@ -95,10 +98,11 @@
     </select>
 
     <!--엑셀 직원 조회(카테고리, 검색어) -->
-    <select id="selectEmployeeListByCategoryAndSearch" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+    <!--삭제 필요-->
+  <!--  <select id="selectEmployeeListByCategoryAndSearch" resultType="com.example.employee_system.bean.dto.EmployeeDto">
         SELECT * FROM EMPLOYEE
         <include refid="searchConditions"/>
-    </select>
+    </select>-->
 
 
 

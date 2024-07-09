@@ -27,10 +27,14 @@
 }
 #listInfo{
     text-align: center;
-    width: 900px;
+    width: 1200px;
+    display: flex;
     margin: auto;
+    margin-top: 50px;
 }
-
+.tree_contriner{
+    width: 15%;
+}
 table {
     width: 100%;
     border-top: 1px solid #444444;
