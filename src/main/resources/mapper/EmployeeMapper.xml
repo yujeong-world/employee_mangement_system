@@ -72,6 +72,9 @@
                 <if test="category == 'email'">
                     AND email LIKE CONCAT('%', #{keyword}, '%')
                 </if>
+                <if test="category == 'department'">
+                    AND department LIKE CONCAT('%', #{keyword}, '%')
+                </if>
             </if>
         </where>
     </sql>
