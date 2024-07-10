@@ -9,5 +9,5 @@ public class TreeDto {
     private int id;
     private String name;
     private int depth;
-    private int parentId;
+    private int parent;
 }
