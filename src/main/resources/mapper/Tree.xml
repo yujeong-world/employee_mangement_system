@@ -1,22 +1,191 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.employee_system.mapper.TreeMapper">
-    <select id="getTree" resultType="com.example.employee_system.bean.dto.TreeDto">
-        WITH RECURSIVE CTE (id, name, depth, parent_id) AS
+<!--    <resultMap id="result" type="com.example.employee_system.bean.dto.TreeDto">-->
+<!--        <result column="id" property="id" jdbcType="VARCHAR"/>-->
+<!--        <result column="name" property="name" jdbcType="VARCHAR"/>-->
+<!--        <result column="depth" property="depth" jdbcType="INTEGER"/>-->
+<!--        <result column="depth" property="depthStr" jdbcType="VARCHAR"/>-->
+<!--        <result column="parent" property="parent" jdbcType="VARCHAR"/>-->
+<!--    </resultMap>-->
+    <!--<select id="getTree" resultType="com.example.employee_system.bean.dto.TreeDto">
+&lt;!&ndash;    <select id="getTree" resultMap="result">&ndash;&gt;
+        WITH RECURSIVE CTE (id, name, depth, parent) AS
                            (
-                               SELECT t1.id, t1.name, t1.depth, t1.parent_id
+                               SELECT t1.id, t1.name, t1.depth, t1.parent
                                FROM tree t1
-                               WHERE t1.parent_id = -1
+                               WHERE t1.parent = '#'
 
                                UNION ALL
 
-                               SELECT t2.id, t2.name, t2.depth, t2.parent_id
+                               SELECT t2.id, t2.name, t2.depth, t2.parent
                                FROM tree t2
-                                        INNER JOIN CTE ON t2.parent_id = CTE.id
+                                        INNER JOIN CTE ON t2.parent = CTE.id
                            )
 
-        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent_id FROM CTE
+        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent FROM CTE
         ORDER BY CTE.id;
+    </select>-->
+
+    <!--<select id="getTree" resultType="com.example.employee_system.bean.dto.TreeDto">
+        WITH RECURSIVE CTE (id, name, depth, parent) AS (
+            SELECT
+                CAST(t1.id AS VARCHAR) AS id,
+                t1.name,
+                t1.depth,
+                CASE WHEN t1.parent = -1 THEN '#' ELSE CAST(t1.parent AS VARCHAR) END AS parent
+            FROM tree t1
+            WHERE t1.parent = -1
+
+            UNION ALL
+
+            SELECT
+                CAST(t2.id AS VARCHAR) AS id,
+                t2.name,
+                t2.depth,
+                CASE WHEN t2.parent = -1 THEN '#' ELSE CAST(t2.parent AS VARCHAR) END AS parent
+            FROM tree t2
+                     INNER JOIN CTE ON t2.parent = CAST(CTE.id AS INTEGER)
+        )
+
+        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent
+        FROM CTE
+        ORDER BY CAST(CTE.id AS INTEGER);
     </select>
+-->
+   <!-- <select id="getTree" resultType="com.example.employee_system.bean.dto.TreeDto">
+        WITH RECURSIVE CTE (id, name, depth, parent) AS (
+            SELECT
+                CAST(t1.id AS VARCHAR) AS id,
+                t1.name,
+                t1.depth,
+                CASE WHEN t1.parent = -1 THEN '#' ELSE CAST(t1.parent AS VARCHAR) END AS parent
+            FROM tree t1
+            WHERE t1.parent = -1
+
+            UNION ALL
+
+            SELECT
+                CAST(t2.id AS VARCHAR) AS id,
+                t2.name,
+                t2.depth,
+                CASE WHEN t2.parent = -1 THEN '#' ELSE CAST(t2.parent AS VARCHAR) END AS parent
+            FROM tree t2
+                     INNER JOIN CTE ON
+                (t2.parent = CAST(CTE.id AS INTEGER) AND CTE.parent != '#')
+                    OR (CTE.parent = '#' AND t2.parent = -1)
+        )
+
+        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent
+        FROM CTE
+        ORDER BY CAST(CTE.id AS INTEGER);
+    </select>-->
+
+
+
+
+        <resultMap id="treeResultMap" type="com.example.employee_system.bean.dto.TreeDto">
+            <result column="id" property="id" jdbcType="VARCHAR"/>
+            <result column="name" property="name" jdbcType="VARCHAR"/>
+            <result column="depth" property="depth" jdbcType="INTEGER"/>
+            <result column="parent" property="parent" jdbcType="VARCHAR"/>
+        </resultMap>
+
+        <select id="dd">
+            select *, <include refid="getTrees"/> as tt
+                   from group_info
+            where tt in (#{delId})
+        </select>
+
+    <sql id="getTrees">
+        WITH RECURSIVE CTE (id, name, depth, parent) AS
+                           (
+                               SELECT t1.id, t1.name, t1.depth, t1.parent
+                               FROM tree t1
+                               WHERE t1.parent = '-1'
+
+                               UNION ALL
+
+                               SELECT t2.id, t2.name, t2.depth, t2.parent
+                               FROM tree t2
+                                        INNER JOIN CTE ON t2.parent = CTE.id
+                           )
+
+        SELECT CTE.id, CTE.name, CTE.depth, CTE.parent FROM CTE
+        ORDER BY CTE.id;
+    </sql>
+
+        <select id="getTree" resultMap="treeResultMap">
+            WITH RECURSIVE CTE (id, name, depth, parent) AS
+                               (
+                                   SELECT t1.id, t1.name, t1.depth, t1.parent
+                                   FROM tree t1
+                                   WHERE t1.parent = '-1'
+
+                                   UNION ALL
+
+                                   SELECT t2.id, t2.name, t2.depth, t2.parent
+                                   FROM tree t2
+                                            INNER JOIN CTE ON t2.parent = CTE.id
+                               )
+
+            SELECT CTE.id, CTE.name, CTE.depth, CTE.parent FROM CTE
+            ORDER BY CTE.id;
+        </select>
+
+
+    <select id="insertTree">
+        insert into tree(NAME, DEPTH, PARENT) values (#{name}, #{depth}, #{parent})
+    </select>
+
+<!--    <select id="getTreeByName" resultType="com.example.employee_system.bean.dto.TreeDto">
+        SELECT * FROM TREE WHERE NAME = #{name}
+    </select>
+
+    <select id="getTreeById" resultType="com.example.employee_system.bean.dto.TreeDto">
+        select * from tree where ID = #{id}
+    </select>-->
+
+
+    <!--코드 중복 제거-->
+    <select id="selectTree" resultType="com.example.employee_system.bean.dto.TreeDto">
+        SELECT * FROM TREE
+        <where>
+            <if test="name != null">
+                NAME = #{name}
+            </if>
+            <if test="id != 0">
+                AND ID = #{id}
+            </if>
+            <if test="parent != 0">
+                AND PARENT = #{parent}
+            </if>
+        </where>
+    </select>
+
+    <!--부서 삭제-->
+    <delete id="deleteTree">
+        DELETE
+        FROM TREE
+        WHERE ID = #{id}
+    </delete>
+
+    <!--부서 수정-->
+    <update id="updateTree">
+        UPDATE TREE
+        <set>
+            <if test="name != null">
+                NAME = #{name},
+            </if>
+            <if test="parent != 0">
+                PARENT = #{parent},
+            </if>
+            <if test="depth != 0">
+                DEPTH = #{depth},
+            </if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+
 
 </mapper>

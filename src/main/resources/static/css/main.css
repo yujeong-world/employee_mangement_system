@@ -3,7 +3,7 @@
 }
 
 /* 모달 전체 배경 */
-#add_modal, #modify_modal, #axcel_modal {
+#add_modal, #modify_modal, #axcel_modal, #tree_modal{
     position: fixed; /* 뷰포트에 고정 */
     top: 0;
     left: 0;
@@ -33,7 +33,7 @@
     margin-top: 50px;
 }
 .tree_contriner{
-    width: 15%;
+    width: 18%;
 }
 table {
     width: 100%;
@@ -80,7 +80,7 @@ th, td {
 }
 /*상단 버튼*/
 .table_top_container .btn_area{
-    width: 40%;
+    width: 42%;
     display: flex;
     align-items: center;
 }
@@ -113,4 +113,10 @@ a{
 }
 .font-red{
     color: red;
+}
+.font-blue{
+    color: blue;
+}
+#jstree{
+    text-align: left;
 }

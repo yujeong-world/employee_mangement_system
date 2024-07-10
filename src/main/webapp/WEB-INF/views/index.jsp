@@ -60,16 +60,12 @@
         <div>
             <p>조직도</p>
 
-            <div>
-                조직도 영역입니다.
-            </div>
-
             <div id="jstree"></div>
 
             <div>
-                <button>추가</button>
-                <button>수정</button>
-                <button>삭제</button>
+                <button id="treeAdd">추가</button>
+                <button id="treeModify">수정</button>
+                <button id="treeDelete">삭제</button>
             </div>
         </div>
 
@@ -275,6 +271,48 @@
                 </div>
             </div>
 
+            <%--조직도 추가 모달--%>
+            <div id="tree_modal">
+                <div class="inner">
+                    <p>조직 추가창</p>
+
+                    <div class="select_area">
+                        <label class="tree_select">상위 부서를 선택해주세요.(선택하지 않을 경우, 최상위)</label>
+                        <select id="tree_select" name="tree_select">
+
+                        </select>
+                    </div>
+
+                    <div class="treeMod">
+                        <label>변경할 부서를 선택해주세요</label>
+                        <select id="modify_sel" name="modify_sel">
+
+                        </select>
+                    </div>
+                    <label>부서명</label>
+                    <input type="text" placeholder="부서명을 입력해주세요." class="treeAdd" id="treeId">
+                    <button onclick="treeCheck()" class="treeAdd">중복확인</button> <span class="tree_check"></span>
+                    <div class="treeMod">
+                        <label>상위 부서를 선택해주세요.(선택하지 않을 경우, 최상위)</label>
+                        <select id="modify_sel_parent" name="modify_sel_parent">
+
+                        </select>
+                    </div>
+
+
+
+                    <%--<input type="text" class="treeMod" placeholder="수정할 부서명을 입력해주세요.">--%>
+
+
+                    <button onclick="treeAdd()" class="treeAdd">추가하기</button>
+                    <button onclick="treeModify()" class="treeMod">수정하기</button>
+                    <button onclick="treeDelte()" class="treeDel">삭제하기</button>
+                    <button id="tree_modal_close">닫기</button>
+
+                </div>
+            </div>
+
+            <%--조직 삭제 모달창--%>
 
         </div>
     </div>
@@ -642,10 +680,6 @@
             "deleteList": delete_file_list,
         };
 
-        console.log(delete_file_list+"데이터 테스트")
-        debugger
-
-
         // 파일 데이터 추가
         var filesProcessed = 0;
         var totalFiles = $(".file_upload_form input[type='file']").length;
@@ -758,7 +792,130 @@
         })
     }
 
+    // 조직도 영역
+    // 1. 트리 추가 버튼
 
+    // 1-1. 조직도 모달창 버튼 눌렀을 때 상위 부서 select 뿌리기
+
+
+    // 1-2. 부서명 중복 확인
+    function treeCheck(){
+        let treeName = $('#treeId').val();
+        console.log(treeName,"treeId 값")
+        // 값을 입력하지 않은 경우 알림
+        if(treeName == ""){
+            alert("부서명을 입력해주세요.")
+            return;
+        }
+        $.ajax({
+            type: 'GET',
+            url: '${contextPath}/tree/check',
+            data: { name: treeName },
+            dataType: 'text',
+            //contentType: 'application/json; charset=utf-8',
+        }).done(function(response) {
+            console.log(response + ' 리턴 체크');
+            if (response === 'Valid') {
+                alert('사용 가능한 부서명입니다.');
+                $('.tree_check').css({"color": "blue"});
+                $(".tree_check").text('사용가능');
+            } else {
+                alert('이미 사용 중인 직원번호입니다.');
+                $('.tree_check').css({"color": "red"});
+                $(".tree_check").text('사용불가');
+            }
+        }).fail(function(error) {
+            alert('오류가 발생하였습니다.');
+            console.error(JSON.stringify(error));
+        });
+    }
+
+    //1-3 조직 추가하기 버튼
+    function treeAdd(){
+        //부서명과 상위 부서 선택 확인
+        let treeName = $('#treeId').val();
+        let parentId = $('select[name = tree_select] option:selected').val();
+
+        //중복 확인
+        if($(".tree_check").text() == "사용불가"){
+            alert("부서명을 변경해주세요.");
+            return;
+        }
+        if(treeName == ""){
+            alert("부서명을 입력해주세요.")
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '${contextPath}/tree/add',
+            data: JSON.stringify({ name: treeName, parent: parentId }),
+            dataType: 'text',
+            contentType: 'application/json; charset=utf-8',
+        }).done(function(response) {
+            console.log(response + ' 리턴 체크');
+            location.reload();
+        }).fail(function(error) {
+            alert('오류가 발생하였습니다.');
+            console.error(JSON.stringify(error));
+        });
+
+    }
+
+    // 2. 조직도 수정
+    function treeModify(){
+        //변경할 부서 id 가지고 오기
+        let modifyId = $('select[name = modify_sel] option:selected').val();
+        modifyId = parseInt(modifyId)
+        //변경할 이름 가지고 오기
+        let newName = $('#treeId').val();
+        //변경할 상위 부서 선택
+        let modifyParent = $('select[name = modify_sel_parent] option:selected').val();
+        modifyParent = parseInt(modifyParent);
+
+        data = {
+            "id" : modifyId,
+            "name" : newName,
+            "parent": modifyParent
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: "${contextPath}/tree/modify",
+            data: JSON.stringify(data),
+            dataType: 'text',
+            contentType: 'application/json; charset=utf-8',
+        }).done(function(response) {
+            alert(response);
+            location.reload();
+        }).fail(function(error) {
+            alert('오류가 발생하였습니다.');
+            console.error(JSON.stringify(error));
+        });
+
+    }
+
+    // 3. 조직도 - 삭제
+    function treeDelte(){
+        //선택한 부서 id 가지고 오기
+        let selectId = $('select[name = tree_select] option:selected').val();
+        selectId = parseInt(selectId);
+        console.log(selectId, "아이디값입니다.")
+        debugger
+        $.ajax({
+            type: 'POST',
+            url: "${contextPath}/tree/delete",
+            data: { id: selectId },
+            dataType: 'text',
+            //contentType: 'application/json; charset=utf-8',
+        }).done(function(response) {
+            alert(response);
+            location.reload();
+        }).fail(function(error) {
+            alert('오류가 발생하였습니다.');
+            console.error(JSON.stringify(error));
+        });
+    }
 
 
 </script>
@@ -869,8 +1026,6 @@
         }
     }
     $(document).ready(function() {
-        //일괄등록 모달 숨김
-        $("#axcel_modal").hide();
 
         // 페이지 로드 시 URL 파라미터를 읽어와서 폼 필드에 설정
         function setFormFieldsFromURL() {
@@ -899,6 +1054,55 @@
         // 모달창 초기 숨기기
         $("#add_modal").hide();
         $("#modify_modal").hide();
+        $('#tree_modal').hide();
+        //일괄등록 모달 숨김
+        $("#axcel_modal").hide();
+
+        //조직도 모달 - 추가
+        $('#treeAdd').click(function (){
+            $(".treeDel, .treeMod").hide();
+            $(".tree_select").text("상위 부서를 선택해주세요.(선택하지 않을 경우, 최상위)");
+            $("#tree_modal, .treeAdd, .select_area").show();
+        })
+
+        //조직도 모달 - 수정
+        $('#treeModify').click(function (){
+            $(".treeDel, .select_area").hide();
+            //$(".tree_select").text("수정할 부서를 선택해주세요.");
+            $("#tree_modal").show();
+        })
+        // 수정 select 박스
+        /*$('#modify_sel').change(function (){
+            let selectValue = $('select[name = modify_sel] option:selected').text();
+            $('#treeId').val(selectValue)
+
+        });*/
+        // 수정 select 박스
+        $('#modify_sel').change(function (){
+            let selectValue = $('select[name=modify_sel] option:selected').text();
+            let selectId = $('select[name=modify_sel] option:selected').val();
+            $('#treeId').val(selectValue);
+
+            // 선택한 부서를 제외하고 상위 부서 선택 박스를 업데이트
+            $('#modify_sel_parent').empty(); // 기존 옵션을 모두 제거
+            $('#modify_sel option').each(function() {
+                if ($(this).val() != selectId) {
+                    $('#modify_sel_parent').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+                }
+            });
+        });
+
+        //조직도 모달 - 삭제
+        $('#treeDelete').click(function (){
+            $(".treeAdd, .treeMod").hide();
+            $(".tree_select").text("삭제할 부서를 선택해주세요.");
+            $("#tree_modal, .treeDel").show();
+        })
+
+        //조직도 모달 닫기
+        $('#tree_modal_close').click(function (){
+            $('#tree_modal').hide();
+        })
 
         // 등록 버튼 클릭 이벤트
         $('#add_btn').click(function() {
@@ -1068,59 +1272,39 @@
         }
     });*/
     //출처: https://mine-it-record.tistory.com/361 [나만의 기록들:티스토리]
-/*    function getJson() {
+
+    function getTree() {
         debugger
-        $.ajax({
-            type:'get',
-            url:'${contextPath}/tree/list',
-            dataType:'json',
-            success: function(data) {
-                debugger
-                var company = new Array();
-                // 데이터 받아옴
-                $.each(data, function(idx, item){
-                    company[idx] = {id:item.id, parent:item.parent_id, text:item.name};
-                });
-                console.log(company+"데이터")
-                debugger
-
-                // 트리 생성
-                $('#jstree').jstree({
-                    core: {
-                        data: company    //데이터 연결
-                    },
-                    types: {
-                        'default': {
-                            'icon': 'jstree-folder'
-                        }
-                    },
-                    plugins: ['wholerow', 'types']
-                })
-                    .bind('loaded.jstree', function(event, data){
-                        //트리 로딩 롼료 이벤트
-                    })
-                    .bind('select_node.jstree', function(event, data){
-                        //노드 선택 이벤트
-                    })
-
-            },
-            error:function (data) {
-                alert("에러"+data);
-            }
-        });
-    }*/
-    function getJson() {
         $.ajax({
             type: 'GET',
             url: '${contextPath}/tree/list',
             dataType: 'json',
             success: function(data) {
-                var company = [];
+                debugger
+                var company = new Array();
                 // 데이터 받아옴
                 $.each(data, function(idx, item) {
-                    company.push({ id: item.id, parent: item.parent_id, text: item.name });
+                    var idStr = (item.id).toString();
+                    var parentStr = (item.parent).toString();
+                    //-1인 경우 루트이므로 변환해줌
+                    if(parentStr == '-1'){
+                        parentStr = '#'
+                    }
+                    company.push({ id: idStr, parent: parentStr, text: item.name });
+                    //조직도 추가 부분 select 옵션 넣어주기
+                    let treeHtml = `<option id="`+item.id+`" value="`+item.id+`" >`+item.name+`</option>`;
+                    $('#tree_select').append(treeHtml);
+
+                    let treeHtmlModify = `<option id="`+item.id+`" value="`+item.id+`" >`+item.name+`</option>`;
+                    $('#modify_sel').append(treeHtmlModify);
+
                 });
                 console.log("데이터: ", company);
+                console.log("데이터 타입: ", typeof company[0].parent);
+                var test = (company[0].id).toString();
+                console.log("데이터 타입2: ", typeof test);
+
+
                 // 트리 생성
                 $('#jstree').jstree({
                     'core': {
@@ -1134,7 +1318,10 @@
                     'plugins': ['wholerow', 'types']
                 })
                     .bind('loaded.jstree', function(event, data) {
+                        //트리 펼쳐져 있도록
+                        $(this).jstree("open_all");
                         // 트리 로딩 완료 이벤트
+                        console.log("트리", data)
                         console.log('Tree loaded');
                     })
                     .bind('select_node.jstree', function(event, data) {
@@ -1149,7 +1336,7 @@
     }
 
     $(document).ready(function() {
-        getJson();
+        getTree();
     });
 
 

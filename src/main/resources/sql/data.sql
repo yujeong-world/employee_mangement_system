@@ -65,3 +65,11 @@ INSERT INTO employee (EMPLOY_ID, EMPLOY_NAME, DEPARTMENT, EMPLOY_RANK, PHONE, EM
                                                                                                                (28, '장민지', '디자인팀', '이사', '010-8901-2347', 'minji.jang@example.com', '2024-07-02 13:00:00', '2024-07-02 13:00:00'),
                                                                                                                (29, '박하영', '마케팅팀', '인턴', '010-9012-3458', 'hayoung.park@example.com', '2024-07-02 14:00:00', '2024-07-02 14:00:00'),
                                                                                                                (30, '홍지수', '회계팀', '사원', '010-0123-4569', 'jisu.hong@example.com', '2024-07-02 15:00:00', '2024-07-02 15:00:00');
+
+-- 트리 테이블
+CREATE TABLE TREE(
+                     ID serial PRIMARY KEY ,
+                     NAME VARCHAR NOT NULL,
+                     DEPTH integer,
+                     PARENT integer
+);
