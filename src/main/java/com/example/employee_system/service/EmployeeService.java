@@ -63,9 +63,9 @@ public class EmployeeService {
     }
 
     //엑셀 직원 조회(카테고리, 검색어) == 삭제 필요
-    public List<EmployeeDto> getEmployListByCategoryAndSearch(String category, String keyword){
+/*    public List<EmployeeDto> getEmployListByCategoryAndSearch(String category, String keyword){
         return employeeMapper.selectEmployeeListByCategoryAndSearch(category, keyword);
-    }
+    }*/
 
     //조회 새로
     public List<EmployeeDto> getEmployList(String category, String keyword, int pageIndex, int pageSize){

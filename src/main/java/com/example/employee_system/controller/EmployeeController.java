@@ -40,11 +40,10 @@ public class EmployeeController {
             pageInfoVo.setPageIndex(1);
         }
 
-/*        List<TreeDto> trees = treeService.getTree();
-        return trees;*/
         pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
                 pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
 
+       // mav.addObject("department", pageInfoVo.getDepartment());
         mav.addObject("employeeList", pageInfo.getData());
         mav.addObject("totalCount", pageInfo.getTotalCount());
         mav.addObject("pageBar", pageInfo.getTotalPages());
@@ -192,7 +191,7 @@ public class EmployeeController {
 
     }
     //게시판 검색 기능
-    @GetMapping("/search")
+/*    @GetMapping("/search")
     public ModelAndView getEmployeeListBySearch(
             @RequestParam String category,
             @RequestParam String keyword,
@@ -203,7 +202,7 @@ public class EmployeeController {
         mav.addObject("employeeList", searchResults);
         mav.addObject("totalCount", searchResults.getTotalCount());  // 혹은 적절한 토탈 카운트 메소드 사용
         return mav;
-    }
+    }*/
 
 
 }

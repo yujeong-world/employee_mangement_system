@@ -97,6 +97,7 @@
                         <option value="rank">직급</option>
                         <option value="phone">전화번호</option>
                         <option value="email">이메일</option>
+                        <option value="department" hidden>부서</option>
                     </select>
 
                     <select name="pageSize" id="pageSize">
@@ -1068,15 +1069,9 @@
         //조직도 모달 - 수정
         $('#treeModify').click(function (){
             $(".treeDel, .select_area").hide();
-            //$(".tree_select").text("수정할 부서를 선택해주세요.");
             $("#tree_modal").show();
         })
-        // 수정 select 박스
-        /*$('#modify_sel').change(function (){
-            let selectValue = $('select[name = modify_sel] option:selected').text();
-            $('#treeId').val(selectValue)
 
-        });*/
         // 수정 select 박스
         $('#modify_sel').change(function (){
             let selectValue = $('select[name=modify_sel] option:selected').text();
@@ -1327,6 +1322,20 @@
                     .bind('select_node.jstree', function(event, data) {
                         // 노드 선택 이벤트
                         console.log('Node selected', data.node);
+
+                        let category = "department";
+                        let keyword = data.node.text;  // JavaScript에서 인코딩
+
+                        console.log({category, keyword}, "클릭 데이터 확인용");
+                        debugger
+                        // URL에 파라미터를 추가하여 리다이렉트
+                        let url = '${contextPath}/?category='+category+'&keyword='+keyword;
+                        $('input[name="category"]').val("depatment").prop("selected", true);
+                        console.log("키워드 확인 ", url)
+                        debugger
+                        window.location.href = url;
+                        $('input[name="category"]').val("depatment").prop("selected", true);
+
                     });
             },
             error: function(data) {
