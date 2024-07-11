@@ -30,7 +30,8 @@ public class EmailController {
     @PostMapping("/email")
     @ResponseBody
     public String sendEmail(@RequestParam int employId) throws IOException {
-        EmployeeDto employeeDto = employeeService.getEmployById(employId);
+        //pk로 조회
+        EmployeeDto employeeDto = employeeService.getEmploy(0,employId);
 
         Long employeeId = employeeDto.getId();
         //첨부파일 리스트 가지고 오기

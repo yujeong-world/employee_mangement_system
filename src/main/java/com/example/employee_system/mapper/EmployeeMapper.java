@@ -9,10 +9,9 @@ import java.util.List;
 
 @Mapper
 public interface EmployeeMapper {
-    List<EmployeeDto> selectEmployeeList();
 
     //직원 등록
-    void  insertEmployee(EmployeeVo employee);
+    void insertEmployee(EmployeeVo employee);
 
     //직원 아이디 중복 조회
     int idCheck(int id);
@@ -24,25 +23,24 @@ public interface EmployeeMapper {
     void deleteEmployee(int employeeId);
 
     //직원 단건 조회
-    EmployeeDto selectEmployee(int id);
+//    EmployeeDto selectEmployee(int id);
 
     //직원 조회 pk로
-    EmployeeDto selectEmployeeById(int id);
+    //EmployeeDto selectEmployeeById(int id);
 
+    //직원 조회 -  (조건 : 직원 아이디, pk )
+    EmployeeDto selectEmploy(int employId, int id);
     //전체 직원 수 조회
     //int totalCount();
 
     //페이징 조회
-    List<EmployeeDto> findEmployee(int offset, int limit);
+    //List<EmployeeDto> findEmployee(int offset, int limit);
 
     // 검색어 조회
     List<EmployeeDto> searchEmployee(String category, String keyword, int pageIndex, int pageSize);
 
     // 검색 필터링 데이터 총 개수
     int searchEmployeeCount(String category, String keyword);
-
-    //엑셀 다운로드 조회 데이터(카테고리, 키워드)
-    List<EmployeeDto> selectEmployeeListByCategoryAndSearch(String category, String keyword);
 
 
 }

@@ -22,4 +22,5 @@ public class EmployeeDto {
     private String email;
     private LocalDateTime createAt;
     private LocalDateTime modifyAt;
+    private int count;
 }
