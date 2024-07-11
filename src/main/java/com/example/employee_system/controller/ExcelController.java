@@ -47,7 +47,8 @@ public class ExcelController {
     @GetMapping("/download")
     public void downloadExcel(HttpServletResponse response,
                               @RequestParam(required = false) String category,
-                              @RequestParam(required = false) String keyword) throws IOException {
+                              @RequestParam(required = false) String keyword,
+                              @RequestParam(required = false) String department) throws IOException {
 
         List<EmployeeDto> employees;
         // 검색어가 없을 때
@@ -57,7 +58,9 @@ public class ExcelController {
             // 검색어가 존재 할 때
             employees = employeeService.getEmployListByCategoryAndSearch(category, keyword);
         }*/
-        employees = employeeService.getEmployList(category, keyword, 0, 0);
+
+        //수정 필요
+        employees = employeeService.getEmployList(category, keyword, 0, 0 , department);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Employees");

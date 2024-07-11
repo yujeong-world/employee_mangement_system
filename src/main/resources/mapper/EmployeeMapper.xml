@@ -67,9 +67,15 @@
                 <if test="category == 'email'">
                     AND email LIKE CONCAT('%', #{keyword}, '%')
                 </if>
-                <if test="category == 'department'">
+                <!--<if test="category == 'department' and keyword != '전체'" >
                     AND department LIKE CONCAT('%', #{keyword}, '%')
-                </if>
+                </if>-->
+
+            </if>
+
+
+            <if test=" department != null and department !='전체'">
+               AND department LIKE CONCAT('%', #{department}, '%')
             </if>
         </where>
     </sql>

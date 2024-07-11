@@ -15,6 +15,10 @@ public class PageInfoVo {
     private int pageSize = 10;
     private String category;
     private String keyword;
+    //카테고리 부서
+    private String department;
+    //부서명
+    //private String departmentName;
 
     // 기본 생성자
     public PageInfoVo() {}

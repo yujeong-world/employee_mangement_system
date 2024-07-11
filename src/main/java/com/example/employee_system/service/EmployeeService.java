@@ -75,13 +75,13 @@ public class EmployeeService {
         return employeeMapper.selectEmploy(employId,id);
     }
 
-    public List<EmployeeDto> getEmployList(String category, String keyword, int pageIndex, int pageSize){
-        return employeeMapper.searchEmployee(category, keyword, pageIndex, pageSize);
+    public List<EmployeeDto> getEmployList(String category, String keyword, int pageIndex, int pageSize, String department){
+        return employeeMapper.searchEmployee(category, keyword, pageIndex, pageSize, department);
     }
 
     //전체 직원 수 조회
     public int getEmployeeCount(){
-        return employeeMapper.searchEmployeeCount(null,null);
+        return employeeMapper.searchEmployeeCount(null,null, null);
     }
 
 
@@ -90,14 +90,15 @@ public class EmployeeService {
             String category,
             String keyword,
             int pageIndex,
-            int pageSize
+            int pageSize,
+            String department
     ) {
-        int totalCount = employeeMapper.searchEmployeeCount(category, keyword); // 검색 결과의 총 개수
+        int totalCount = employeeMapper.searchEmployeeCount(category, keyword, department); // 검색 결과의 총 개수
 
         if (totalCount <= pageSize) {
             // 검색 결과가 페이지 크기보다 작거나 같은 경우, 페이징 없이 전체 데이터 반환
             List<EmployeeDto> employees = employeeMapper.searchEmployee(
-                    category, keyword, 0, totalCount
+                    category, keyword, 0, totalCount, department
             );
             return new PageInfo<>(1, totalCount, totalCount, employees);
         } else {
@@ -111,7 +112,7 @@ public class EmployeeService {
             }
 
             List<EmployeeDto> employees = employeeMapper.searchEmployee(
-                    category, keyword, (pageIndex-1) * pageSize, pageSize
+                    category, keyword, (pageIndex-1) * pageSize, pageSize, department
             );
             return new PageInfo<>(pageIndex, pageSize, totalCount, employees);
         }

@@ -37,10 +37,10 @@ public interface EmployeeMapper {
     //List<EmployeeDto> findEmployee(int offset, int limit);
 
     // 검색어 조회
-    List<EmployeeDto> searchEmployee(String category, String keyword, int pageIndex, int pageSize);
+    List<EmployeeDto> searchEmployee(String category, String keyword, int pageIndex, int pageSize, String department);
 
     // 검색 필터링 데이터 총 개수
-    int searchEmployeeCount(String category, String keyword);
+    int searchEmployeeCount(String category, String keyword, String department);
 
 
 }

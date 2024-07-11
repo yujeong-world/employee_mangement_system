@@ -41,7 +41,7 @@ public class EmployeeController {
         }
 
         pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
-                pageInfoVo.getPageIndex(), pageInfoVo.getPageSize());
+                pageInfoVo.getPageIndex(), pageInfoVo.getPageSize(), pageInfoVo.getDepartment());
 
        // mav.addObject("department", pageInfoVo.getDepartment());
         mav.addObject("employeeList", pageInfo.getData());

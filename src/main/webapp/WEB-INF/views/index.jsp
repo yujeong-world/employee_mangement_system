@@ -1,4 +1,4 @@
-
+<%@ page import="com.example.employee_system.config.GeneralConfig" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html>
@@ -97,7 +97,7 @@
                         <option value="rank">직급</option>
                         <option value="phone">전화번호</option>
                         <option value="email">이메일</option>
-                        <option value="department" hidden>부서</option>
+                       <%-- <option value="department" hidden>부서</option>--%>
                     </select>
 
                     <select name="pageSize" id="pageSize">
@@ -110,6 +110,7 @@
                     <input id="keyword" type="text" name="keyword" placeholder="검색어를 입력하세요." value="${param.keyword}" required>
                     <input readonly name="pageIndex" type="hidden">
                     <input readonly name="pageSize" type="hidden">
+                        <input readonly name="department" type="hidden" id="department">
                     <button type="submit" class="btn btn-outline-secondary">검색</button>
                 </form>
             </div>
@@ -334,9 +335,10 @@
         let urlSearch = new URLSearchParams(location.search);
         let category = urlSearch.get('category')
         let keyword = urlSearch.get('keyword')
+        let department = urlSearch.get('department')
         //var category = encodeURIComponent("yourCategory"); // 카테고리 값을 설정
         //var keyword = encodeURIComponent("yourKeyword"); //  키워드 값을 설정
-        var url = "${contextPath}/excel/download?category=" + category + "&keyword=" + keyword;
+        var url = "${contextPath}/excel/download?category=" + category + "&keyword=" + keyword+"&department="+department;
         //var url = "${contextPath}/excel/download";
         window.location.href = url;
     }
@@ -902,7 +904,7 @@
         let selectId = $('select[name = tree_select] option:selected').val();
         selectId = parseInt(selectId);
         console.log(selectId, "아이디값입니다.")
-        debugger
+
         $.ajax({
             type: 'POST',
             url: "${contextPath}/tree/delete",
@@ -1026,6 +1028,8 @@
             });
         }
     }
+
+    var useDebug = <%=GeneralConfig.USE_DEBUG%>;
     $(document).ready(function() {
 
         // 페이지 로드 시 URL 파라미터를 읽어와서 폼 필드에 설정
@@ -1034,7 +1038,14 @@
             const category = urlParams.get('category');
             const pageSize = urlParams.get('pageSize');
             const keyword = urlParams.get('keyword');
+            const department = urlParams.get('department');
             const pageIndex = urlParams.get('pageIndex');
+
+            console.log(category, pageSize, keyword, pageSize)
+            if(useDebug){
+                debugger
+            }
+
 
             if (category) {
                 $('#category').val(category);
@@ -1045,13 +1056,15 @@
                 var test =  $('#pageSize').val(pageSize);
                 console.log("페이징 사이즈"+test);
             }
-            console.log(keyword && category!="department")
-            debugger
-            if (keyword && category!="department") {
+
+            if(keyword){
                 $('#keyword').val(keyword);
-            }else {
-                $('#keyword').val('');
             }
+
+            if(department){
+                $('#department').val(department);
+            }
+
             if (pageIndex) {
                 $('input[name="pageIndex"]').val(pageIndex);
             }
@@ -1163,7 +1176,13 @@
         // 페이지 사이즈 선택 이벤트 처리
         $('#pageSize').change(function() {
             var selectedSize = $(this).val();  // 선택된 페이지 크기
+            //키워드
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyword = urlParams.get('keyword');
+            //var keyword = $("#keyword").val();
             $('input[name="pageSize"]').val(selectedSize);  // 폼의 hidden input 업데이트
+            $('input[name="keyword"]').val(keyword);  // 폼의 hidden input 업데이트
+           // $('input[name="department"]').val(keyword); // 폼의 부서 데이터 업데이트
             $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
             $('#searchForm').submit();  // 변경된 페이지 크기로 폼 제출
         });
@@ -1273,13 +1292,11 @@
     //출처: https://mine-it-record.tistory.com/361 [나만의 기록들:티스토리]
 
     function getTree() {
-        debugger
         $.ajax({
             type: 'GET',
             url: '${contextPath}/tree/list',
             dataType: 'json',
             success: function(data) {
-                debugger
                 var company = new Array();
                 // 데이터 받아옴
                 $.each(data, function(idx, item) {
@@ -1331,14 +1348,20 @@
                         let keyword = data.node.text;  // JavaScript에서 인코딩
 
                         console.log({category, keyword}, "클릭 데이터 확인용");
-                        debugger
+
                         // URL에 파라미터를 추가하여 리다이렉트
-                        let url = '${contextPath}/?category='+category+'&keyword='+keyword;
-                        $('input[name="category"]').val("depatment").prop("selected", true);
-                        console.log("키워드 확인 ", url)
+                        //let url = '${contextPath}/?category='+category+'&keyword='+keyword;
+
+                        //let url = '${contextPath}/?department='+keyword;
+                        $('input[name="department"]').val(keyword);
+
+                        //console.log("키워드 확인 ", url)
+                        $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
+                        $('select[name="category"]').val("");
                         debugger
-                        window.location.href = url;
-                        $('input[name="category"]').val("depatment").prop("selected", true);
+                        //window.location.href = url;
+                        $('#searchForm').submit();  // 변경된 페이지 크기로 폼 제출
+                        //$('input[name="category"]').val("depatment").prop("selected", true);
 
                     });
             },
