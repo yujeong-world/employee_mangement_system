@@ -10,7 +10,7 @@
 
     <meta charset="UTF-8">
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/main.css?after">
+    <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/main.css">
     <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="${contextPath}/static/css/bootstrap-grid.min.css">
     <!-- jsTree 스타일시트 -->
@@ -68,6 +68,8 @@
                 <button id="treeDelete">삭제</button>
             </div>
         </div>
+
+        <a href="${contextPath}/chart">통계보기</a>
 
     </div>
     <div>
