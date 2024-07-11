@@ -1045,8 +1045,12 @@
                 var test =  $('#pageSize').val(pageSize);
                 console.log("페이징 사이즈"+test);
             }
-            if (keyword) {
+            console.log(keyword && category!="department")
+            debugger
+            if (keyword && category!="department") {
                 $('#keyword').val(keyword);
+            }else {
+                $('#keyword').val('');
             }
             if (pageIndex) {
                 $('input[name="pageIndex"]').val(pageIndex);
