@@ -2,15 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.employee_system.mapper.EmployeeMapper">
 
-<!--    <select id="selectEmployeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee
-    </select>-->
-
-    <select id="employeeList" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee
-    </select>
-
-
     <!--직원 아이디 중복 조회 -->
     <select id="idCheck" resultType="int">
         select count(*)
@@ -18,15 +9,19 @@
         where employ_id = #{id}
     </select>
 
-    <!--직원 단건 조회-->
-    <select id="selectEmployee" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee where employ_id = #{id}
+    <!--직원 조회 중복 제거-->
+    <select id="selectEmploy" resultType="com.example.employee_system.bean.dto.EmployeeDto">
+        SELECT * FROM EMPLOYEE
+        <where>
+            <if test="employId != 0">
+                EMPLOY_ID = #{employId}
+            </if>
+            <if test="id != 0">
+                ID = #{id}
+            </if>
+        </where>
     </select>
 
-    <!--직원 조회 pk-->
-    <select id="selectEmployeeById" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        select * from employee where id = #{id}
-    </select>
 
     <!--직원 등록-->
     <insert id="insertEmployee" parameterType="com.example.employee_system.vo.EmployeeVo" >
@@ -93,20 +88,11 @@
         <include refid="pagination"/>
     </select>
 
-
     <!-- 검색된 직원 수 조회 -->
     <select id="searchEmployeeCount" resultType="int">
         select count(*) from employee
         <include refid="searchConditions"/>
     </select>
-
-    <!--엑셀 직원 조회(카테고리, 검색어) -->
-    <!--삭제 필요-->
-  <!--  <select id="selectEmployeeListByCategoryAndSearch" resultType="com.example.employee_system.bean.dto.EmployeeDto">
-        SELECT * FROM EMPLOYEE
-        <include refid="searchConditions"/>
-    </select>-->
-
 
 
 </mapper>

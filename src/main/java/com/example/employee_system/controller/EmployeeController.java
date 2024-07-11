@@ -64,8 +64,8 @@ public class EmployeeController {
         mav.setViewName("employeeDetail");
 
         // 직원 파일 조회
-        //1. 직원 조회
-        EmployeeDto employee = employeeService.employee(employId);
+        //1. 직원 조회(employId로)
+        EmployeeDto employee = employeeService.getEmploy(employId, 0);
         mav.addObject("employee", employee);
 
         // 2. 직원 파일 정보 조회
@@ -92,8 +92,8 @@ public class EmployeeController {
             // 직원 정보 저장
             employeeService.addEmployee(request.getEmployeeVo());
 
-            // 직원 정보를 저장한 후에 직원 ID를 가져옵니다.
-            EmployeeDto employeeDto = employeeService.employee(request.getEmployeeVo().getEmployId());
+            // 직원 정보를 저장한 후에 직원 ID를 가져옵니다.(employId로 조회)
+            EmployeeDto employeeDto = employeeService.getEmploy(request.getEmployeeVo().getEmployId(), 0);
 
             Long id = employeeDto.getId();
             int employId = request.getEmployeeVo().getEmployId();
@@ -137,7 +137,7 @@ public class EmployeeController {
     @GetMapping("/modifyEmploy/{id}")
     public ResponseEntity<RequestDto> modifyEmployInfo(@PathVariable("id") int id) {
 
-        EmployeeDto employee = employeeService.employee(id);
+        EmployeeDto employee = employeeService.getEmploy(id, 0);
         System.out.println("콘솔 테스트 : 직원 수정" + employee);
 
         // 수정할 직원 조회 - 파일 조회
@@ -165,7 +165,7 @@ public class EmployeeController {
             employeeService.modifyEmployee(joinRequestDto.getEmployeeVo());
 
             //pk 받기
-            EmployeeDto employeeDto = employeeService.employee(employId);
+            EmployeeDto employeeDto = employeeService.getEmploy(employId, 0);
             Long id = employeeDto.getId();
 
             //파일 저장
@@ -190,19 +190,7 @@ public class EmployeeController {
         }
 
     }
-    //게시판 검색 기능
-/*    @GetMapping("/search")
-    public ModelAndView getEmployeeListBySearch(
-            @RequestParam String category,
-            @RequestParam String keyword,
-            @RequestParam(defaultValue = "1") int pageIndex,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        ModelAndView mav = new ModelAndView("index");  // 검색 결과를 보여줄 뷰 지정
-        PageInfo<EmployeeDto> searchResults = employeeService.getEmployeeBySearch(category, keyword, pageIndex, pageSize);
-        mav.addObject("employeeList", searchResults);
-        mav.addObject("totalCount", searchResults.getTotalCount());  // 혹은 적절한 토탈 카운트 메소드 사용
-        return mav;
-    }*/
+
 
 
 }
