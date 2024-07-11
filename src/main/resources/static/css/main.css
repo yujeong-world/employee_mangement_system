@@ -32,6 +32,13 @@
     margin: auto;
     margin-top: 50px;
 }
+.chart_Container{
+    text-align: center;
+    width: 1000px;
+    /*display: flex;*/
+    margin: auto;
+    margin-top: 50px;
+}
 .tree_contriner{
     width: 18%;
 }
