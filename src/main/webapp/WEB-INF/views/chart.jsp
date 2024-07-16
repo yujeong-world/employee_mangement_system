@@ -58,11 +58,22 @@
     var jData = JSON.parse(jsonObject);
 
     var htmlData = "<tr><th>그룹</th><th>직원 수</th></tr>";
+    var total=0;
     //표 만들기
     for (var i = 0; i < jData.length; i++) {
-        htmlData += "<tr><td>" + jData[i].department + "</td>" +
-            "<td>" + jData[i].count + "</td></tr>";
+        console.log(jData[i].department+"부서");
+        if(jData[i].department == undefined){
+            htmlData += "<tr><td>무소속</td>" +
+                "<td>" + jData[i].count + "</td></tr>";
+        }else{
+            htmlData += "<tr><td>" + jData[i].department + "</td>" +
+                "<td>" + jData[i].count + "</td></tr>";
+        }
+        total+=jData[i].count;
     }
+    //총합
+    htmlData += "<tr><td>총합</td>" +
+        "<td>" + total + "</td></tr>";
     $("#tableArea").html(htmlData);
 
     //데이터2
@@ -101,7 +112,7 @@
     }
 
 
-    var data = {
+   var data = {
         labels: labelList,
         datasets: [{
             backgroundColor: colorList,
@@ -110,7 +121,7 @@
         options: {
             title: {
                 display: true,
-                text: '유저별 접속 횟수'
+                text: '유저별 접속 횟수',
             }
         }
     };
@@ -132,8 +143,26 @@
     var ctx1 = document.getElementById('departmentCount').getContext('2d');
     new Chart(ctx1, {
         type: 'pie',
-        data: data
+        data: data,
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                            let percentage = ((context.raw / total) * 100).toFixed(2) + '%';
+                            return context.label + ': ' + context.raw + ' (' + percentage + ')';
+                        }
+                    }
+                }
+            }
+        }
     });
+/*    var ctx1 = document.getElementById('departmentCount').getContext('2d');
+    new Chart(ctx1, {
+        type: 'pie',
+        data: data
+    });*/
 
 
     var ctx2 = document.getElementById('departmentTable').getContext('2d');

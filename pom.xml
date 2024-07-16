@@ -13,6 +13,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>employee_system</name>
     <description>employee_system</description>
+    <packaging>war</packaging>
     <url/>
 
     <properties>
