@@ -31,13 +31,15 @@
     display: flex;
     margin: auto;
     margin-top: 50px;
+    flex-wrap: wrap;
 }
 .chart_Container{
     text-align: center;
     width: 1000px;
-    /*display: flex;*/
+    display: flex;
     margin: auto;
     margin-top: 50px;
+    flex-wrap: wrap;
 }
 .tree_contriner{
     width: 18%;
@@ -126,4 +128,15 @@ a{
 }
 #jstree{
     text-align: left;
+}
+.chart_box{
+    width: 46%;
+    margin: auto;
+}
+.w-100{
+    width: 100% !important;
+}
+.chart_area{
+    display: flex;
+    flex-wrap: wrap;
 }
