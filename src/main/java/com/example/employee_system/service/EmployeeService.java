@@ -1,14 +1,11 @@
 package com.example.employee_system.service;
 
-import ch.qos.logback.classic.Logger;
 import com.example.employee_system.bean.dto.EmployeeDto;
-import com.example.employee_system.bean.dto.TreeDto;
 import com.example.employee_system.mapper.EmployeeMapper;
 import com.example.employee_system.page.PageInfo;
 import com.example.employee_system.vo.EmployeeVo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +29,6 @@ public class EmployeeService {
     //직원 번호 중복 조회
     public String idCheck(int employId){
         try {
-            /*EmployeeDto employeeDto = employeeMapper.idCheck(employId);
-            System.out.println(employeeDto.getCount());
-            int idCheck = employeeDto.getCount();*/
             int idCheck = employeeMapper.idCheck(employId);
 
             if(idCheck == 0){
@@ -59,16 +53,6 @@ public class EmployeeService {
     public void deleteEmployee(int employeeId){
         employeeMapper.deleteEmployee(employeeId);
     }
-
-    //직원 상세 조회
-/*    public EmployeeDto employee(int id){
-        return employeeMapper.selectEmployee(id);
-    }*/
-
-    //직원 조회 pk로
-   /* public EmployeeDto getEmployById(int id){
-        return employeeMapper.selectEmployeeById(id);
-    }*/
 
     //직원 단건 조회 (조건 : 직원 아이디, pk )
     public EmployeeDto getEmploy(int employId, int id){

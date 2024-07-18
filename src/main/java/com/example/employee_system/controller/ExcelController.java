@@ -14,7 +14,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -51,16 +50,16 @@ public class ExcelController {
                               @RequestParam(required = false) String department) throws IOException {
 
         List<EmployeeDto> employees;
-        // 검색어가 없을 때
-        /*if (category == null || keyword == null) {
-            employees = employeeService.employeeList();
-        } else {
-            // 검색어가 존재 할 때
-            employees = employeeService.getEmployListByCategoryAndSearch(category, keyword);
-        }*/
 
-        //수정 필요
+        //검색어가 아무것도 없을 때
+        if(category.equals("null") && keyword.equals("null") && department.equals("null")) {
+            category="";
+            keyword="";
+            department="";
+        }
+
         employees = employeeService.getEmployList(category, keyword, 0, 0 , department);
+        log.info("employees: {}", employees);
 
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Employees");
