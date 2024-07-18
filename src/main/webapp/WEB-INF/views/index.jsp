@@ -1044,9 +1044,9 @@
             const pageIndex = urlParams.get('pageIndex');
 
             console.log(category, pageSize, keyword, pageSize)
-            if(useDebug){
+          /*  if(useDebug){
                 debugger
-            }
+            }*/
 
 
             if (category) {
@@ -1360,7 +1360,6 @@
                         //console.log("키워드 확인 ", url)
                         $('input[name="pageIndex"]').val(1); // 페이지 넘버는 1로 세팅
                         $('select[name="category"]').val("");
-                        debugger
                         //window.location.href = url;
                         $('#searchForm').submit();  // 변경된 페이지 크기로 폼 제출
                         //$('input[name="category"]').val("depatment").prop("selected", true);

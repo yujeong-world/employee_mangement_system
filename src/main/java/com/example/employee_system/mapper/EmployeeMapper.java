@@ -2,7 +2,6 @@ package com.example.employee_system.mapper;
 
 import com.example.employee_system.bean.dto.EmployeeDto;
 import com.example.employee_system.vo.EmployeeVo;
-import com.example.employee_system.vo.FileVo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -22,19 +21,8 @@ public interface EmployeeMapper {
     //직원 삭제
     void deleteEmployee(int employeeId);
 
-    //직원 단건 조회
-//    EmployeeDto selectEmployee(int id);
-
-    //직원 조회 pk로
-    //EmployeeDto selectEmployeeById(int id);
-
     //직원 조회 -  (조건 : 직원 아이디, pk )
     EmployeeDto selectEmploy(int employId, int id);
-    //전체 직원 수 조회
-    //int totalCount();
-
-    //페이징 조회
-    //List<EmployeeDto> findEmployee(int offset, int limit);
 
     // 검색어 조회
     List<EmployeeDto> searchEmployee(String category, String keyword, int pageIndex, int pageSize, String department);

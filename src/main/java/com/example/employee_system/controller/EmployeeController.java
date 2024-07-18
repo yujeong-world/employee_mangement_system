@@ -8,6 +8,9 @@ import com.example.employee_system.service.TreeService;
 import com.example.employee_system.vo.FileVo;
 import com.example.employee_system.vo.PageInfoVo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.Base64;
 import java.util.List;
 
+@Slf4j
 @Controller
 @AllArgsConstructor
 public class EmployeeController {
@@ -30,7 +34,9 @@ public class EmployeeController {
     public ModelAndView employeeList(@ModelAttribute PageInfoVo pageInfoVo) {
         ModelAndView mav = new ModelAndView("index"); // 뷰 이름 설정
 
-        PageInfo<EmployeeDto> pageInfo;
+        PageInfo<EmployeeDto> pageInfo = null;
+
+      log.info("pageInfoVo.toString() : {}", pageInfoVo.toString());
 
         if(pageInfoVo.getPageSize() == 0){
             pageInfoVo.setPageSize(10);
@@ -40,8 +46,12 @@ public class EmployeeController {
             pageInfoVo.setPageIndex(1);
         }
 
-        pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
-                pageInfoVo.getPageIndex(), pageInfoVo.getPageSize(), pageInfoVo.getDepartment());
+        try {
+            pageInfo = employeeService.getEmployeeBySearch(pageInfoVo.getCategory(), pageInfoVo.getKeyword(),
+                    pageInfoVo.getPageIndex(), pageInfoVo.getPageSize(), pageInfoVo.getDepartment());
+        } catch (Exception e){
+            log.error(e.getMessage(), e);
+        }
 
        // mav.addObject("department", pageInfoVo.getDepartment());
         mav.addObject("employeeList", pageInfo.getData());
@@ -50,6 +60,9 @@ public class EmployeeController {
         mav.addObject("pageInfoVo", pageInfoVo); // Front-end에서 페이지 정보 유지를 위해 전달
 
         mav.addObject("pageInfo", pageInfoVo);
+
+        log.info("pageInfo.getData() : {}", pageInfo.getData());
+
         System.out.println(pageInfo.getData());
         return mav;
     }

@@ -17,13 +17,10 @@ public class PageInfoVo {
     private String keyword;
     //카테고리 부서
     private String department;
-    //부서명
-    //private String departmentName;
 
     // 기본 생성자
     public PageInfoVo() {}
 
-    // getters and setters
     public int getPageIndex() {
         return pageIndex;
     }
